@@ -6,51 +6,92 @@
 <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data: blob:; connect-src 'self'; form-action 'none'; base-uri 'none'">
 <title>Painel BI</title>
 <style>
-:root{--bg:#f4f6fb;--card:#fff;--line:#e5e9f2;--txt:#13203a;--mut:#6b7691;--acc:#3b6cff;--acc2:#7c5cff;--ok:#1fa971;--warn:#e9a23b;--err:#e5484d;--sh:0 8px 24px rgba(20,30,60,.08)}
-:root[data-theme=dark]{--bg:#0b1020;--card:#121a30;--line:#22304f;--txt:#e8edf7;--mut:#8b97b3;--acc:#5b8dff;--acc2:#9b7dff;--sh:0 10px 30px rgba(0,0,0,.35)}
-*{box-sizing:border-box}html{-webkit-text-size-adjust:100%}
-body{margin:0;background:var(--bg);color:var(--txt);font:14px/1.45 system-ui,Segoe UI,Roboto,sans-serif}
+:root{--bg:#eef1f3;--card:#fff;--line:#dfe5e8;--txt:#1d2a2e;--mut:#66757b;--teal:#3b7a73;--teal2:#2a5b56;--gold:#b8832a;--gold2:#e8b45a;--red:#b23a3a;--ok:#2c8a5a;--head:#1f3a37;--sh:0 1px 3px rgba(20,40,40,.08)}
+:root[data-theme=dark]{--bg:#121a1c;--card:#1b2528;--line:#2a373b;--txt:#e6edef;--mut:#93a3a8;--teal:#4fa398;--gold:#d9a650;--head:#0f1d1b;--sh:0 1px 3px rgba(0,0,0,.4)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--txt);font:14px/1.45 "Segoe UI",system-ui,Roboto,sans-serif}
 button,select,input{font:inherit}
-/* tela de senha */
-#lock{position:fixed;inset:0;display:grid;place-items:center;background:radial-gradient(900px 500px at 30% 0%,#2a3f80 0%,#0b1020 60%);color:#e8edf7;z-index:10;padding:16px}
-.lk{width:100%;max-width:400px;background:#121a30;border:1px solid #22304f;border-radius:18px;padding:28px;box-shadow:0 20px 60px rgba(0,0,0,.4)}
-.lk h1{font-size:22px;margin:0 0 4px}.lk p{color:#8b97b3;margin:0 0 18px;font-size:13px}
-.lk input{width:100%;padding:12px;border-radius:10px;border:1px solid #22304f;background:#0e1529;color:#fff;font-size:16px;margin-bottom:10px}
-.lk button{width:100%;padding:12px;border:0;border-radius:10px;background:var(--acc);color:#fff;font-weight:600;cursor:pointer;font-size:15px}
-.lk .alt{background:#1b2744;margin-top:8px}
-.lk .err{color:#ff7b82;font-size:13px;margin-top:10px;min-height:18px}
-.lk .seal{display:flex;gap:8px;align-items:center;font-size:12px;color:#8b97b3;margin-top:16px}
-/* app */
-#app{display:none;max-width:1280px;margin:0 auto;padding:16px}
-.top{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;margin-bottom:14px}
-.top h1{font-size:22px;margin:0;letter-spacing:-.3px}
-.top .meta{color:var(--mut);font-size:12px}
-.tools{display:flex;gap:8px;flex-wrap:wrap}
-.btn{background:var(--card);border:1px solid var(--line);color:var(--txt);border-radius:10px;padding:8px 12px;cursor:pointer;box-shadow:var(--sh)}
-.btn.p{background:var(--acc);border-color:var(--acc);color:#fff}
-.filters{display:flex;gap:8px;flex-wrap:wrap;align-items:center;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 12px;box-shadow:var(--sh);margin-bottom:14px}
-.filters select,.filters input{background:var(--bg);border:1px solid var(--line);color:var(--txt);border-radius:9px;padding:7px 10px}
-.chip{background:var(--acc);color:#fff;border-radius:999px;padding:4px 10px;font-size:12px;cursor:pointer}
-.grid{display:grid;gap:14px;grid-template-columns:repeat(12,1fr)}
-.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;box-shadow:var(--sh);min-width:0}
-.card h3{margin:0 0 10px;font-size:13px;color:var(--mut);font-weight:600;text-transform:uppercase;letter-spacing:.4px;display:flex;justify-content:space-between;align-items:center;gap:8px}
-.card h3 select{font-size:12px;text-transform:none;letter-spacing:0;background:var(--bg);border:1px solid var(--line);color:var(--txt);border-radius:8px;padding:4px 8px}
-.kpi{grid-column:span 3}.kpi .v{font-size:26px;font-weight:700;letter-spacing:-.5px;line-height:1.1}
-.kpi .d{font-size:12px;color:var(--mut);margin-top:6px}.kpi .d b{font-weight:600}
-.up{color:var(--ok)}.dn{color:var(--err)}
-.c6{grid-column:span 6}.c8{grid-column:span 8}.c4{grid-column:span 4}.c12{grid-column:span 12}
-svg{width:100%;height:auto;display:block}
-.bar{cursor:pointer;transition:opacity .15s}.bar:hover{opacity:.8}
-.tip{position:fixed;pointer-events:none;background:var(--txt);color:var(--card);padding:6px 10px;border-radius:8px;font-size:12px;display:none;z-index:20;white-space:nowrap}
+#lock{position:fixed;inset:0;display:grid;place-items:center;background:radial-gradient(900px 500px at 30% 0%,#2f5a55 0%,#0f1d1b 60%);color:#e8edf7;z-index:10;padding:16px}
+.lk{width:100%;max-width:400px;background:#162624;border:1px solid #2b4240;border-radius:16px;padding:28px;box-shadow:0 20px 60px rgba(0,0,0,.4)}
+.lk h1{font-size:22px;margin:0 0 4px}.lk p{color:#9fb3af;margin:0 0 18px;font-size:13px}
+.lk input{width:100%;padding:12px;border-radius:10px;border:1px solid #2b4240;background:#0f1d1b;color:#fff;font-size:16px;margin-bottom:10px}
+.lk button{width:100%;padding:12px;border:0;border-radius:10px;background:var(--gold);color:#1a1a1a;font-weight:700;cursor:pointer;font-size:15px}
+.lk .alt{background:#24403c;color:#e8edf7;margin-top:8px;font-weight:500}
+.lk .err{color:#ff8a8a;font-size:13px;margin-top:10px;min-height:18px}
+.lk .seal{font-size:12px;color:#9fb3af;margin-top:16px}
+#app{display:none}
+/* cabecalho */
+.head{background:var(--head);color:#fff;padding:18px 26px 0}
+.head .eyebrow{font:12px/1 ui-monospace,Consolas,monospace;letter-spacing:.12em;color:#8fc1b8}
+.head .row{display:flex;flex-wrap:wrap;gap:12px;align-items:flex-end;justify-content:space-between}
+.head h1{font-size:34px;margin:6px 0 4px;font-weight:800;letter-spacing:-.5px}
+.head h1 em{font-style:normal;color:var(--gold2)}
+.head .base{font-size:13px;color:#c5d6d2;margin-bottom:14px}.head .base code{color:#9fd3c7;font-family:ui-monospace,Consolas,monospace}
+.hbtn{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+.hbtn button{background:transparent;border:1px solid #4e6f6a;color:#fff;border-radius:6px;padding:8px 14px;cursor:pointer}
+.hbtn button.p{background:var(--gold2);border-color:var(--gold2);color:#1a1a1a;font-weight:600}
+.tabs{display:flex;gap:4px}
+.tab{background:transparent;border:0;color:#c5d6d2;padding:10px 18px;border-radius:8px 8px 0 0;cursor:pointer;font-size:15px}
+.tab.on{background:var(--bg);color:var(--txt);font-weight:600}
+.tab .n{display:inline-block;background:var(--red);color:#fff;border-radius:999px;font-size:11px;padding:1px 7px;margin-left:6px;vertical-align:middle}
+/* corpo */
+.body{display:grid;grid-template-columns:400px 1fr;gap:14px;padding:14px 26px 40px;max-width:1900px;margin:0 auto}
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px;box-shadow:var(--sh);padding:16px 18px;min-width:0}
+.card h3{margin:0;font-size:17px;font-weight:700}
+.card .sub{color:var(--mut);font-size:13px;margin:2px 0 10px}
+.card .top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+.exp{background:var(--bg);border:1px solid var(--line);color:var(--txt);border-radius:6px;padding:6px 12px;cursor:pointer;font-size:13px;white-space:nowrap}
+/* filtros */
+.side{position:sticky;top:10px;align-self:start;max-height:calc(100vh - 20px);overflow:auto}
+.side h2{font-size:18px;margin:0}
+.side .hint{color:var(--mut);font-size:13px;margin:6px 0 12px}
+.fgrp{border:1px solid var(--line);border-radius:10px;margin-bottom:10px;background:var(--card)}
+.fgrp .fh{display:flex;align-items:center;gap:8px;padding:10px 12px;cursor:pointer;user-select:none}
+.fgrp .fh b{font-size:15px}.fgrp .fh .cnt{margin-left:auto;color:var(--mut);font-size:12px}.fgrp .fh .sel{color:var(--mut);font-size:12px;width:100%;padding-left:20px}
+.fgrp .fb{padding:0 12px 10px;display:none}.fgrp.open .fb{display:block}
+.fgrp input.q{width:100%;padding:8px 10px;border-radius:8px;border:1px solid var(--line);background:var(--bg);color:var(--txt);margin-bottom:8px}
+.fgrp .meta{display:flex;justify-content:space-between;font-size:12px;color:var(--mut);margin-bottom:6px}
+.fgrp .meta span{cursor:pointer;color:var(--teal)}
+.fl{max-height:260px;overflow:auto;border:1px solid var(--line);border-radius:8px;padding:4px 8px}
+.fi{display:grid;grid-template-columns:18px 1fr auto;gap:8px;align-items:center;padding:5px 0;cursor:pointer;font-size:13px}
+.fi .v{color:var(--mut);font-size:12px;white-space:nowrap}.fi .v b{color:var(--teal);font-weight:600}.fi .v i{font-style:normal;color:var(--gold)}
+.fi .bar{grid-column:2/4;height:3px;background:var(--line);border-radius:2px;overflow:hidden}.fi .bar i{display:block;height:100%;background:var(--teal)}
+.fi.off{opacity:.45}
+/* principal */
+.main{display:flex;flex-direction:column;gap:14px;min-width:0}
+.chips{display:flex;flex-wrap:wrap;gap:8px;align-items:center;font-size:13px;color:var(--mut)}
+.chip{background:#e4efed;color:var(--teal2);border:1px solid #bcd8d2;border-radius:999px;padding:4px 12px;cursor:pointer;font-size:13px}
+:root[data-theme=dark] .chip{background:#223a37;color:#9fd3c7;border-color:#2f5a55}
+.chips .right{margin-left:auto}
+.kpis{display:grid;grid-template-columns:repeat(5,1fr);gap:12px}
+.kpi{background:var(--card);border:1px solid var(--line);border-top:4px solid var(--line);border-radius:10px;padding:14px 16px;box-shadow:var(--sh)}
+.kpi.t{border-top-color:var(--teal)}.kpi.g{border-top-color:var(--gold)}
+.kpi .l{font-size:12px;color:var(--mut);letter-spacing:.08em;text-transform:uppercase}
+.kpi .v{font-size:30px;font-weight:800;letter-spacing:-.5px;margin:4px 0 2px;color:var(--txt)}
+.kpi.t .v{color:var(--teal2)}.kpi.g .v{color:var(--gold)}.kpi .v.neg{color:var(--red)}.kpi .v.pos{color:var(--ok)}
+:root[data-theme=dark] .kpi.t .v{color:var(--teal)}
+.kpi .d{font-size:13px;color:var(--mut)}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.leg{display:flex;gap:16px;font-size:13px;color:var(--mut);margin-bottom:8px}.leg i{display:inline-block;width:12px;height:12px;border-radius:2px;vertical-align:-1px;margin-right:6px}
+svg{width:100%;height:auto;display:block;font-family:inherit}
+.bar{cursor:pointer}.bar:hover{opacity:.75}
+.tip{position:fixed;pointer-events:none;background:#1d2a2e;color:#fff;padding:6px 10px;border-radius:6px;font-size:12px;display:none;z-index:20;white-space:nowrap}
 table{width:100%;border-collapse:collapse;font-size:13px}
 th,td{padding:7px 8px;border-bottom:1px solid var(--line);text-align:left;white-space:nowrap}
 th{color:var(--mut);font-weight:600;cursor:pointer;user-select:none;position:sticky;top:0;background:var(--card)}
 td.n,th.n{text-align:right;font-variant-numeric:tabular-nums}
-.tbl{overflow:auto;max-height:420px;border-radius:10px}
+.tbl{overflow:auto;max-height:440px}
 .pag{display:flex;gap:8px;align-items:center;justify-content:flex-end;margin-top:8px;color:var(--mut);font-size:12px}
-.empty{color:var(--mut);padding:30px;text-align:center}
-@media(max-width:900px){.kpi{grid-column:span 6}.c6,.c8,.c4{grid-column:span 12}}
-@media(max-width:520px){.kpi{grid-column:span 12}#app{padding:10px}.kpi .v{font-size:22px}}
+.pag button{background:var(--bg);border:1px solid var(--line);color:var(--txt);border-radius:6px;padding:3px 10px;cursor:pointer}
+.empty{color:var(--mut);padding:24px;text-align:center}
+/* pontos de atencao */
+.pt{display:grid;grid-template-columns:auto 1fr;gap:12px;padding:12px 0;border-bottom:1px solid var(--line);align-items:start}
+.pt .ic{width:34px;height:34px;border-radius:8px;display:grid;place-items:center;font-weight:800;color:#fff;background:var(--red)}
+.pt .ic.w{background:var(--gold)}.pt .ic.i{background:var(--teal)}
+.pt b{display:block;font-size:14px}.pt span{color:var(--mut);font-size:13px}
+.side-toggle{display:none}
+@media(max-width:1100px){.body{grid-template-columns:1fr}.side{position:static;max-height:none}.kpis{grid-template-columns:repeat(2,1fr)}.g2{grid-template-columns:1fr}.head h1{font-size:26px}.body{padding:12px}.head{padding:14px 14px 0}}
+@media(max-width:520px){.kpis{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
@@ -66,21 +107,33 @@ td.n,th.n{text-align:right;font-variant-numeric:tabular-nums}
 </div></div>
 
 <div id="app">
-  <div class="top">
-    <div><h1 id="titulo">Painel</h1><div class="meta" id="meta"></div></div>
-    <div class="tools"><button class="btn" id="tema">◐ Tema</button><button class="btn" id="limpar">Limpar filtros</button><button class="btn" id="csv">Exportar CSV</button><button class="btn" id="sair">Bloquear</button></div>
+  <div class="head">
+    <div class="eyebrow" id="eyebrow">PAINEL</div>
+    <div class="row">
+      <div><h1 id="titulo"></h1><div class="base" id="base"></div></div>
+      <div class="hbtn"><button id="tema">◐ Tema</button><button id="csv">Exportar CSV ▾</button><button id="limpar">Limpar filtros</button><button class="p" id="sair">Bloquear</button></div>
+    </div>
+    <div class="tabs"><button class="tab on" data-tab="geral">Visão geral</button><button class="tab" data-tab="pontos">Pontos de atenção <span class="n" id="nPontos">0</span></button></div>
   </div>
-  <div class="filters" id="filters"></div>
-  <div class="grid" id="grid">
-    <div class="card kpi"><h3>Total</h3><div class="v" id="kTotal">–</div><div class="d" id="kTotalD"></div></div>
-    <div class="card kpi"><h3 id="kMetaH">Meta</h3><div class="v" id="kMeta">–</div><div class="d" id="kMetaD"></div></div>
-    <div class="card kpi"><h3>Último mês</h3><div class="v" id="kMes">–</div><div class="d" id="kMesD"></div></div>
-    <div class="card kpi"><h3 id="kDistH">Registros</h3><div class="v" id="kDist">–</div><div class="d" id="kDistD"></div></div>
-    <div class="card c8"><h3>Mês a mês <span id="legenda" style="font-weight:400;text-transform:none"></span></h3><div id="gMes"></div></div>
-    <div class="card c4"><h3>Ranking <select id="selRank"></select></h3><div id="gRank"></div></div>
-    <div class="card c6"><h3>Participação <select id="selPart"></select></h3><div id="gPart"></div></div>
-    <div class="card c6"><h3>Mapa de calor <select id="selHeat"></select></h3><div id="gHeat"></div></div>
-    <div class="card c12"><h3>Detalhe <input id="busca" placeholder="Buscar…" style="font-size:12px;text-transform:none;letter-spacing:0;background:var(--bg);border:1px solid var(--line);color:var(--txt);border-radius:8px;padding:4px 8px"></h3><div class="tbl" id="tbl"></div><div class="pag" id="pag"></div></div>
+  <div class="body">
+    <aside class="side">
+      <div class="card">
+        <div class="top"><h2>Filtros</h2><span style="color:var(--teal);cursor:pointer;font-size:13px" id="limpar2">Limpar tudo</span></div>
+        <div class="hint" id="fhint">Tique os valores. Os números ao lado mudam na hora. Cada lista mostra só o que existe dentro do que já está marcado.</div>
+        <div id="fper"></div>
+        <div id="filtros"></div>
+      </div>
+    </aside>
+    <main class="main">
+      <div id="tabGeral" style="display:flex;flex-direction:column;gap:14px">
+        <div class="card chips" id="chips"></div>
+        <div class="kpis" id="kpis"></div>
+        <div class="g2"><div class="card" id="cDim1"></div><div class="card" id="cMes"></div></div>
+        <div class="g2"><div class="card" id="cDim2"></div><div class="card" id="cDim3"></div></div>
+        <div class="card"><div class="top"><div><h3>Detalhe</h3><div class="sub" id="tsub"></div></div><div style="display:flex;gap:8px"><input id="busca" placeholder="Buscar…" style="padding:6px 10px;border-radius:6px;border:1px solid var(--line);background:var(--bg);color:var(--txt)"><button class="exp" id="expTbl">Exportar</button></div></div><div class="tbl" id="tbl"></div><div class="pag" id="pag"></div></div>
+      </div>
+      <div id="tabPontos" style="display:none"><div class="card"><h3>Pontos de atenção</h3><div class="sub">Gerados automaticamente a partir do recorte atual</div><div id="pontos"></div></div></div>
+    </main>
   </div>
 </div>
 <div class="tip" id="tip"></div>
@@ -96,12 +149,12 @@ async function decifrar(u8,senha){
   const ds=new DecompressionStream('gzip');const w=ds.writable.getWriter();w.write(gz);w.close();return JSON.parse(td.decode(await new Response(ds.readable).arrayBuffer()));
 }
 /* ---------- estado ---------- */
-const $=s=>document.querySelector(s);let P=null,bin=null,filtros={},periodo=[null,null],ordem={c:null,d:1},pag=0,busca='';
-const PAL=['#3b6cff','#7c5cff','#1fa971','#e9a23b','#e5484d','#17a2b8','#ff7ab6','#8bc34a','#9e9e9e','#6d4c41'];
+const $=s=>document.querySelector(s);let P=null,bin=null,filtros={},periodo=[null,null],ordem={c:null,d:1},pag=0,busca='',aberto={},buscaF={};
 const fmtN=n=>n==null?'–':new Intl.NumberFormat('pt-BR',{maximumFractionDigits:Math.abs(n)<100?2:0}).format(n);
-const fmtC=n=>n==null?'–':new Intl.NumberFormat('pt-BR',{notation:Math.abs(n)>=1e6?'compact':'standard',maximumFractionDigits:Math.abs(n)>=1e6?2:0}).format(n);
+const fmtC=n=>{if(n==null)return '–';const a=Math.abs(n);if(a>=1e9)return (n/1e9).toLocaleString('pt-BR',{maximumFractionDigits:2})+' bi';if(a>=1e6)return (n/1e6).toLocaleString('pt-BR',{maximumFractionDigits:1})+' mi';if(a>=1e4)return (n/1e3).toLocaleString('pt-BR',{maximumFractionDigits:0})+' mil';return fmtN(n);};
 const MES=['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'];
 const mesKey=d=>d?String(d).slice(0,7):null;const mesLabel=k=>k?MES[+k.slice(5,7)-1]+'/'+k.slice(2,4):'';
+const esc=s=>String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;');
 /* ---------- abertura ---------- */
 async function tentarFetch(){try{const r=await fetch('dados.bin',{cache:'no-store'});if(r.ok){bin=new Uint8Array(await r.arrayBuffer());if(String.fromCharCode(...bin.subarray(0,4))==='BIC1')return true;}}catch{}bin=null;return false;}
 tentarFetch().then(ok=>{if(!ok)$('#lkErr').textContent='dados.bin não encontrado ao lado do painel. Use "Escolher o arquivo".';});
@@ -115,120 +168,146 @@ async function abrir(){
   catch(e){$('#lkErr').textContent=e.message.includes('válido')?e.message:'Senha incorreta.';}
   $('#abrir').textContent='Abrir painel';$('#abrir').disabled=false;
 }
-$('#sair').onclick=()=>{P=null;$('#app').style.display='none';$('#lock').style.display='grid';$('#grid').querySelectorAll('[id^=g],#tbl').forEach(e=>e.innerHTML='');};
+$('#sair').onclick=()=>{P=null;$('#app').style.display='none';$('#lock').style.display='grid';['#filtros','#kpis','#cDim1','#cMes','#cDim2','#cDim3','#tbl','#pontos'].forEach(s=>$(s).innerHTML='');};
 $('#tema').onclick=()=>{const r=document.documentElement;r.dataset.theme=r.dataset.theme==='dark'?'light':'dark';};
-if(matchMedia('(prefers-color-scheme:dark)').matches)document.documentElement.dataset.theme='dark';
+document.querySelectorAll('.tab').forEach(t=>t.onclick=()=>{document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('on',x===t));$('#tabGeral').style.display=t.dataset.tab==='geral'?'flex':'none';$('#tabPontos').style.display=t.dataset.tab==='pontos'?'block':'none';});
 /* ---------- init ---------- */
-let C,iData,iVal,iMeta,dims,nums;
+let C,iData,iVal,iMeta,dims,nomeVal,nomeMeta;
 function iniciar(){
-  filtros={};periodo=[null,null];ordem={c:null,d:1};pag=0;busca='';$('#busca').value='';
+  filtros={};periodo=[null,null];ordem={c:null,d:1};pag=0;busca='';$('#busca').value='';aberto={};buscaF={};
   C=P.cols;iData=P.papeis.data;iVal=P.papeis.valor;iMeta=P.papeis.meta;
-  dims=C.map((c,i)=>i).filter(i=>C[i].tipo==='categoria'&&C[i].distintos<=200&&C[i].distintos>1);
-  nums=C.map((c,i)=>i).filter(i=>C[i].tipo==='numero');
-  $('#titulo').textContent=P.titulo;$('#lkTitle').textContent=P.titulo;
-  $('#meta').textContent=`${P.linhas.length.toLocaleString('pt-BR')} registros · origem ${P.origem} · gerado em ${new Date(P.geradoEm).toLocaleString('pt-BR')}`;
+  nomeVal=C[iVal].nome;nomeMeta=iMeta!=null?C[iMeta].nome:null;
+  dims=C.map((c,i)=>i).filter(i=>C[i].tipo==='categoria'&&C[i].distintos<=500&&C[i].distintos>1).sort((a,b)=>C[a].distintos-C[b].distintos);
+  const t=P.titulo||'Painel';const parts=t.split(/\s[×x—-]\s/);
+  $('#titulo').innerHTML=parts.length>1?esc(parts[0])+' <em>× '+esc(parts.slice(1).join(' '))+'</em>':esc(t);
+  $('#eyebrow').textContent='PAINEL · '+t.toUpperCase();$('#lkTitle').textContent=t;
+  $('#base').innerHTML=`Base: <code>${esc(P.origem||'planilha')}</code> · ${P.linhas.length.toLocaleString('pt-BR')} registros · cifrado em ${new Date(P.geradoEm).toLocaleString('pt-BR')}`;
   $('#lock').style.display='none';$('#app').style.display='block';
-  // filtros
-  const F=$('#filters');F.innerHTML='';
+  $('#fhint').textContent=`Tique os valores. Os números ao lado mudam na hora (${nomeVal.toLowerCase()}${nomeMeta?' · '+nomeMeta.toLowerCase():''}).`;
   if(iData!=null){const ds=P.linhas.map(r=>r[iData]).filter(Boolean).sort();periodo=[ds[0],ds[ds.length-1]];
-    F.insertAdjacentHTML('beforeend',`<span style="color:var(--mut);font-size:12px">Período</span><input type="date" id="d0" value="${ds[0].slice(0,10)}"><input type="date" id="d1" value="${ds[ds.length-1].slice(0,10)}">`);
+    $('#fper').innerHTML=`<div class="fgrp open"><div class="fh"><b>Período</b></div><div class="fb" style="display:flex;gap:8px"><input type="date" id="d0" value="${ds[0].slice(0,10)}" style="flex:1;padding:7px;border-radius:8px;border:1px solid var(--line);background:var(--bg);color:var(--txt)"><input type="date" id="d1" value="${ds[ds.length-1].slice(0,10)}" style="flex:1;padding:7px;border-radius:8px;border:1px solid var(--line);background:var(--bg);color:var(--txt)"></div></div>`;
     $('#d0').onchange=e=>{periodo[0]=e.target.value;render();};$('#d1').onchange=e=>{periodo[1]=e.target.value;render();};}
-  dims.slice(0,5).forEach(i=>{const vals=[...new Set(P.linhas.map(r=>r[i]).filter(v=>v!=null&&v!==''))].sort();
-    F.insertAdjacentHTML('beforeend',`<select data-dim="${i}"><option value="">${C[i].nome}: todos</option>${vals.map(v=>`<option>${v}</option>`).join('')}</select>`);});
-  F.querySelectorAll('select').forEach(s=>s.onchange=()=>{const i=+s.dataset.dim;if(s.value)filtros[i]=new Set([s.value]);else delete filtros[i];render();});
-  const opts=dims.map(i=>`<option value="${i}">${C[i].nome}</option>`).join('');
-  ['#selRank','#selPart','#selHeat'].forEach((s,k)=>{$(s).innerHTML=opts;$(s).value=dims[Math.min(k,dims.length-1)];$(s).onchange=render;});
-  $('#kMetaH').textContent=iMeta!=null?'Atingimento':'Média por registro';
-  $('#kDistH').textContent=dims.length?C[dims[0]].nome:'Registros';
-  $('#busca').oninput=e=>{busca=e.target.value.toLowerCase();pag=0;render();};
-  $('#limpar').onclick=()=>{filtros={};F.querySelectorAll('select').forEach(s=>s.value='');if(iData!=null){const ds=P.linhas.map(r=>r[iData]).filter(Boolean).sort();periodo=[ds[0],ds[ds.length-1]];$('#d0').value=ds[0].slice(0,10);$('#d1').value=ds[ds.length-1].slice(0,10);}render();};
-  $('#csv').onclick=exportar;
+  else $('#fper').innerHTML='';
+  dims.slice(0,2).forEach(i=>aberto[i]=true);
+  $('#busca').oninput=e=>{busca=e.target.value.toLowerCase();pag=0;tabela(filtrar());};
+  $('#limpar').onclick=$('#limpar2').onclick=()=>{filtros={};if(iData!=null){const ds=P.linhas.map(r=>r[iData]).filter(Boolean).sort();periodo=[ds[0],ds[ds.length-1]];$('#d0').value=ds[0].slice(0,10);$('#d1').value=ds[ds.length-1].slice(0,10);}render();};
+  $('#csv').onclick=()=>exportCsv(C.map(c=>c.nome),filtrar(),'painel_filtrado.csv');
+  $('#expTbl').onclick=()=>exportCsv(C.map(c=>c.nome),filtrar(),'detalhe.csv');
   render();
 }
-function filtrar(){return P.linhas.filter(r=>{if(iData!=null&&r[iData]){const d=r[iData].slice(0,10);if(periodo[0]&&d<periodo[0].slice(0,10))return false;if(periodo[1]&&d>periodo[1].slice(0,10))return false;}
-  for(const i in filtros)if(!filtros[i].has(String(r[i])))return false;return true;});}
-function soma(rows,i){let s=0;for(const r of rows)if(typeof r[i]==='number')s+=r[i];return s;}
-function agrupar(rows,i,v){const m=new Map();for(const r of rows){const k=r[i]??'(vazio)';m.set(k,(m.get(k)||0)+(typeof r[v]==='number'?r[v]:0));}return m;}
-function chipsFiltro(){const F=$('#filters');F.querySelectorAll('.chip').forEach(c=>c.remove());for(const i in filtros)for(const v of filtros[i]){if([...F.querySelectorAll('select')].some(s=>s.dataset.dim==i&&s.value===v))continue;const c=document.createElement('span');c.className='chip';c.textContent=`${C[i].nome}: ${v} ✕`;c.onclick=()=>{delete filtros[i];render();};F.appendChild(c);}}
+function filtrar(exceto){return P.linhas.filter(r=>{if(iData!=null&&r[iData]){const d=String(r[iData]).slice(0,10);if(periodo[0]&&d<periodo[0].slice(0,10))return false;if(periodo[1]&&d>periodo[1].slice(0,10))return false;}
+  for(const i in filtros){if(+i===exceto)continue;if(filtros[i].size&&!filtros[i].has(String(r[i]??'(vazio)')))return false;}return true;});}
+const num=(r,i)=>typeof r[i]==='number'?r[i]:0;
+function soma(rows,i){let s=0;for(const r of rows)s+=num(r,i);return s;}
+function agrupar(rows,i){const m=new Map();for(const r of rows){const k=r[i]??'(vazio)';let o=m.get(k);if(!o){o={v:0,m:0,n:0};m.set(k,o);}o.v+=num(r,iVal);if(iMeta!=null)o.m+=num(r,iMeta);o.n++;}return m;}
+function toggle(i,v,solo){if(!filtros[i])filtros[i]=new Set();if(solo){filtros[i]=filtros[i].has(v)&&filtros[i].size===1?new Set():new Set([v]);}else{filtros[i].has(v)?filtros[i].delete(v):filtros[i].add(v);}if(!filtros[i].size)delete filtros[i];render();}
 /* ---------- render ---------- */
 function render(){
-  const rows=filtrar();chipsFiltro();
-  const total=soma(rows,iVal);
-  $('#kTotal').textContent=fmtC(total);$('#kTotalD').innerHTML=`<b>${rows.length.toLocaleString('pt-BR')}</b> registros no filtro`;
-  if(iMeta!=null){const m=soma(rows,iMeta);const at=m?total/m*100:null;$('#kMeta').innerHTML=at==null?'–':`<span class="${at>=100?'up':at>=80?'':'dn'}">${at.toFixed(1)}%</span>`;$('#kMetaD').innerHTML=`meta <b>${fmtC(m)}</b> · ${at==null?'':(total-m>=0?'+':'')+fmtC(total-m)}`;}
-  else{$('#kMeta').textContent=fmtC(rows.length?total/rows.length:null);$('#kMetaD').textContent='valor médio';}
-  // mês
-  let meses=[];if(iData!=null){const g=new Map(),gm=new Map();for(const r of rows){const k=mesKey(r[iData]);if(!k)continue;g.set(k,(g.get(k)||0)+(typeof r[iVal]==='number'?r[iVal]:0));if(iMeta!=null)gm.set(k,(gm.get(k)||0)+(typeof r[iMeta]==='number'?r[iMeta]:0));}
-    meses=[...g.keys()].sort().map(k=>({k,v:g.get(k),m:gm.get(k)}));}
-  if(meses.length){const u=meses[meses.length-1],a=meses[meses.length-2];const var_=a&&a.v?(u.v-a.v)/a.v*100:null;
-    $('#kMes').textContent=fmtC(u.v);$('#kMesD').innerHTML=`${mesLabel(u.k)}${var_==null?'':` · <b class="${var_>=0?'up':'dn'}">${var_>=0?'▲':'▼'} ${Math.abs(var_).toFixed(1)}%</b> vs ${mesLabel(a.k)}`}`;}
-  else{$('#kMes').textContent='–';$('#kMesD').textContent='sem coluna de data';}
-  if(dims.length){const n=new Set(rows.map(r=>r[dims[0]])).size;$('#kDist').textContent=n.toLocaleString('pt-BR');$('#kDistD').textContent='distintos no filtro';}
-  else{$('#kDist').textContent=rows.length.toLocaleString('pt-BR');$('#kDistD').textContent='linhas';}
-  $('#gMes').innerHTML=meses.length?gMeses(meses):'<div class="empty">Sem coluna de data</div>';
-  $('#legenda').textContent=iMeta!=null?'■ real  – – meta':'';
-  const iR=+$('#selRank').value,iP=+$('#selPart').value,iH=+$('#selHeat').value;
-  $('#gRank').innerHTML=dims.length?gRank(agrupar(rows,iR,iVal),iR):'';
-  $('#gPart').innerHTML=dims.length?gRosca(agrupar(rows,iP,iVal),iP):'';
-  $('#gHeat').innerHTML=dims.length&&iData!=null?gHeat(rows,iH):'<div class="empty">Precisa de data e categoria</div>';
-  tabela(rows);
+  const rows=filtrar();
+  renderFiltros();
+  // chips
+  let ch='<span>Filtrando por</span>';let any=false;
+  for(const i in filtros)for(const v of filtros[i]){any=true;ch+=`<span class="chip" data-dim="${i}" data-val="${esc(v)}">${esc(C[i].nome)}: ${esc(v)} ✕</span>`;}
+  if(!any)ch+='<span class="chip" style="cursor:default;opacity:.7">tudo</span>';
+  ch+=`<span class="right">${rows.length.toLocaleString('pt-BR')} registros no recorte</span>`;$('#chips').innerHTML=ch;
+  // kpis
+  const tot=soma(rows,iVal),met=iMeta!=null?soma(rows,iMeta):null;const dif=met!=null?tot-met:null,pct=met?dif/met*100:null;
+  let k=`<div class="kpi t"><div class="l">${esc(nomeVal)}</div><div class="v">${fmtC(tot)}</div><div class="d">${fmtN(tot)}</div></div>`;
+  if(met!=null){k+=`<div class="kpi g"><div class="l">${esc(nomeMeta)}</div><div class="v">${fmtC(met)}</div><div class="d">${fmtN(met)}</div></div>`;
+    k+=`<div class="kpi"><div class="l">Variação × ${esc(nomeMeta)}</div><div class="v ${pct==null?'':pct<0?'neg':'pos'}">${pct==null?'–':(pct>=0?'+':'')+pct.toFixed(1)+'%'}</div><div class="d">${dif==null?'':(dif>=0?'+':'−')+fmtN(Math.abs(dif))}</div></div>`;}
+  else{k+=`<div class="kpi g"><div class="l">Média por registro</div><div class="v">${fmtC(rows.length?tot/rows.length:null)}</div><div class="d">${rows.length.toLocaleString('pt-BR')} registros</div></div>`;
+    k+=`<div class="kpi"><div class="l">Registros</div><div class="v">${rows.length.toLocaleString('pt-BR')}</div><div class="d">no recorte</div></div>`;}
+  dims.slice(0,2).forEach(i=>{k+=`<div class="kpi"><div class="l">${esc(C[i].nome)}</div><div class="v">${new Set(rows.map(r=>r[i])).size.toLocaleString('pt-BR')}</div><div class="d">com ${esc(nomeVal.toLowerCase())} no recorte</div></div>`;});
+  $('#kpis').innerHTML=k;$('#kpis').style.gridTemplateColumns=`repeat(${Math.min(5,2+(met!=null?1:1)+dims.slice(0,2).length)},1fr)`;
+  // cards por dimensao
+  const slots=['#cDim1','#cDim2','#cDim3'];const ordem=dims.length?[dims[0],...dims.slice(1).sort((a,b)=>C[b].distintos-C[a].distintos).slice(0,2)]:[];
+  slots.forEach((s,k)=>{const i=ordem[k];const el=$(s);if(i==null){el.style.display='none';return;}el.style.display='';const g=agrupar(rows,i);el.innerHTML=cardDim(i,g);});
+  // mes a mes
+  if(iData!=null){const g=new Map();for(const r of rows){const key=mesKey(r[iData]);if(!key)continue;let o=g.get(key);if(!o){o={v:0,m:0};g.set(key,o);}o.v+=num(r,iVal);if(iMeta!=null)o.m+=num(r,iMeta);}
+    const meses=[...g.keys()].sort().map(key=>({k:key,...g.get(key)}));
+    $('#cMes').style.display='';$('#cMes').innerHTML=`<div class="top"><div><h3>Mês a mês</h3><div class="sub">${esc(nomeVal)}${nomeMeta?' e '+esc(nomeMeta):''}</div></div><button class="exp" data-exp="mes">Exportar</button></div>${legenda()}${meses.length?gMeses(meses):'<div class="empty">Sem dados</div>'}<div class="sub">${meses.length} meses</div>`;
+    $('#cMes [data-exp]').onclick=()=>exportCsv(['Mês',nomeVal,...(nomeMeta?[nomeMeta]:[])],meses.map(m=>[m.k,m.v,...(nomeMeta?[m.m]:[])]),'mes_a_mes.csv');}
+  else{$('#cMes').style.display='none';}
+  tabela(rows);pontos(rows);
 }
-const esc=s=>String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;');
-function gMeses(m){
-  const W=760,H=260,L=56,R=16,T=16,B=36;const n=m.length,max=Math.max(...m.map(x=>Math.max(x.v,x.m||0)))||1;
-  const x=i=>L+(W-L-R)*(i+0.5)/n,bw=Math.min(40,(W-L-R)/n*0.6),y=v=>T+(H-T-B)*(1-v/max);
+function legenda(){return `<div class="leg"><span><i style="background:var(--teal)"></i>${esc(nomeVal)}</span>${nomeMeta?`<span><i style="background:var(--gold)"></i>${esc(nomeMeta)}</span>`:''}</div>`;}
+function cardDim(i,g){
+  const arr=[...g.entries()].sort((a,b)=>b[1].v-a[1].v);const top=arr.slice(0,12);
+  const html=`<div class="top"><div><h3>Por ${esc(C[i].nome.toLowerCase())}</h3><div class="sub">${esc(nomeVal)}${nomeMeta?' × '+esc(nomeMeta):''}</div></div><button class="exp" data-exp="${i}">Exportar</button></div>${legenda()}${gPares(top,i)}<div class="sub">${arr.length} itens${arr.length>12?' · mostrando 12':''}</div>`;
+  setTimeout(()=>{const b=document.querySelector(`[data-exp="${i}"]`);if(b)b.onclick=()=>exportCsv([C[i].nome,nomeVal,...(nomeMeta?[nomeMeta]:[]),'Registros'],arr.map(([k,o])=>[k,o.v,...(nomeMeta?[o.m]:[]),o.n]),'por_'+C[i].nome+'.csv');});
+  return html;
+}
+function gPares(arr,i){
+  if(!arr.length)return '<div class="empty">Sem dados</div>';
+  const W=560,L=170,R=70,rh=nomeMeta?40:26,H=arr.length*rh+6;const max=Math.max(...arr.map(([,o])=>Math.max(o.v,o.m)))||1;
   let s=`<svg viewBox="0 0 ${W} ${H}">`;
-  for(let k=0;k<=4;k++){const v=max*k/4;s+=`<line x1="${L}" x2="${W-R}" y1="${y(v)}" y2="${y(v)}" stroke="var(--line)"/><text x="${L-6}" y="${y(v)+4}" font-size="10" fill="var(--mut)" text-anchor="end">${fmtC(v)}</text>`;}
-  m.forEach((p,i)=>{s+=`<rect class="bar" x="${x(i)-bw/2}" y="${y(p.v)}" width="${bw}" height="${H-B-y(p.v)}" rx="5" fill="var(--acc)" data-tip="${mesLabel(p.k)}: ${fmtN(p.v)}${p.m?' · meta '+fmtN(p.m):''}" data-mes="${p.k}"/>`;
-    if(n<=18||i%Math.ceil(n/18)===0)s+=`<text x="${x(i)}" y="${H-B+16}" font-size="11" fill="var(--mut)" text-anchor="middle">${mesLabel(p.k)}</text>`;});
-  if(m.some(p=>p.m)){s+=`<polyline fill="none" stroke="var(--warn)" stroke-width="2" stroke-dasharray="5 4" points="${m.map((p,i)=>`${x(i)},${y(p.m||0)}`).join(' ')}"/>`;}
+  arr.forEach(([k,o],j)=>{const y=j*rh;const w1=(W-L-R)*o.v/max,w2=(W-L-R)*o.m/max;
+    s+=`<text x="${L-10}" y="${y+(nomeMeta?16:17)}" font-size="12" fill="var(--txt)" text-anchor="end">${esc(String(k).slice(0,26))}</text>`;
+    s+=`<rect class="bar" x="${L}" y="${y+4}" width="${Math.max(2,w1)}" height="${nomeMeta?14:16}" fill="var(--teal)" data-tip="${esc(k)} · ${esc(nomeVal)}: ${fmtN(o.v)} (${o.n} reg.)" data-dim="${i}" data-val="${esc(k)}"/><text x="${L+w1+6}" y="${y+(nomeMeta?15:17)}" font-size="11" fill="var(--txt)">${fmtC(o.v)}</text>`;
+    if(nomeMeta)s+=`<rect class="bar" x="${L}" y="${y+20}" width="${Math.max(2,w2)}" height="14" fill="var(--gold)" data-tip="${esc(k)} · ${esc(nomeMeta)}: ${fmtN(o.m)}" data-dim="${i}" data-val="${esc(k)}"/><text x="${L+w2+6}" y="${y+31}" font-size="11" fill="var(--mut)">${fmtC(o.m)}</text>`;});
   return s+'</svg>';
 }
-function gRank(map,i){
-  const arr=[...map.entries()].sort((a,b)=>b[1]-a[1]).slice(0,10);if(!arr.length)return '<div class="empty">Sem dados</div>';
-  const max=arr[0][1]||1,H=arr.length*28+4,W=360;let s=`<svg viewBox="0 0 ${W} ${H}">`;
-  arr.forEach(([k,v],j)=>{const y=j*28,w=Math.max(2,(W-195)*v/max);
-    s+=`<text x="0" y="${y+17}" font-size="12" fill="var(--txt)">${esc(String(k).slice(0,18))}</text><rect class="bar" x="140" y="${y+5}" width="${w}" height="16" rx="4" fill="${PAL[j%PAL.length]}" data-tip="${esc(k)}: ${fmtN(v)}" data-dim="${i}" data-val="${esc(k)}"/><text x="${145+w}" y="${y+17}" font-size="11" fill="var(--mut)">${fmtC(v)}</text>`;});
+function gMeses(m){
+  const W=620,H=260,L=56,R=10,T=14,B=34;const n=m.length,max=Math.max(...m.map(x=>Math.max(x.v,x.m)))||1;
+  const slot=(W-L-R)/n,bw=nomeMeta?Math.min(16,slot*0.38):Math.min(34,slot*0.7),x=i=>L+slot*(i+0.5),y=v=>T+(H-T-B)*(1-v/max);
+  let s=`<svg viewBox="0 0 ${W} ${H}">`;
+  for(let k=0;k<=3;k++){const v=max*k/3;s+=`<line x1="${L}" x2="${W-R}" y1="${y(v)}" y2="${y(v)}" stroke="var(--line)"/><text x="${L-6}" y="${y(v)+4}" font-size="10" fill="var(--mut)" text-anchor="end">${fmtC(v)}</text>`;}
+  m.forEach((p,i)=>{const cx=x(i);
+    if(nomeMeta){s+=`<rect class="bar" x="${cx-bw-1}" y="${y(p.v)}" width="${bw}" height="${H-B-y(p.v)}" fill="var(--teal)" data-tip="${mesLabel(p.k)} · ${esc(nomeVal)}: ${fmtN(p.v)}" data-mes="${p.k}"/><rect class="bar" x="${cx+1}" y="${y(p.m)}" width="${bw}" height="${H-B-y(p.m)}" fill="var(--gold)" data-tip="${mesLabel(p.k)} · ${esc(nomeMeta)}: ${fmtN(p.m)}" data-mes="${p.k}"/>`;}
+    else s+=`<rect class="bar" x="${cx-bw/2}" y="${y(p.v)}" width="${bw}" height="${H-B-y(p.v)}" fill="var(--teal)" data-tip="${mesLabel(p.k)}: ${fmtN(p.v)}" data-mes="${p.k}"/>`;
+    if(n<=14||i%Math.ceil(n/14)===0)s+=`<text x="${cx}" y="${H-B+16}" font-size="11" fill="var(--mut)" text-anchor="middle">${mesLabel(p.k)}</text>`;});
   return s+'</svg>';
 }
-function gRosca(map,i){
-  let arr=[...map.entries()].filter(e=>e[1]>0).sort((a,b)=>b[1]-a[1]);if(!arr.length)return '<div class="empty">Sem dados</div>';
-  if(arr.length>7){const o=arr.slice(6).reduce((s,e)=>s+e[1],0);arr=arr.slice(0,6);arr.push(['Outros',o]);}
-  const tot=arr.reduce((s,e)=>s+e[1],0);let a0=-Math.PI/2,s=`<svg viewBox="0 0 420 220"><g transform="translate(110,110)">`;
-  arr.forEach(([k,v],j)=>{const a1=a0+v/tot*2*Math.PI;const r=95,ri=58;const p=(a,rr)=>`${(rr*Math.cos(a)).toFixed(1)},${(rr*Math.sin(a)).toFixed(1)}`;const big=a1-a0>Math.PI?1:0;
-    s+=`<path class="bar" d="M${p(a0,r)} A${r},${r} 0 ${big} 1 ${p(a1,r)} L${p(a1,ri)} A${ri},${ri} 0 ${big} 0 ${p(a0,ri)} Z" fill="${PAL[j%PAL.length]}" data-tip="${esc(k)}: ${fmtN(v)} (${(v/tot*100).toFixed(1)}%)" ${k!=='Outros'?`data-dim="${i}" data-val="${esc(k)}"`:''}/>`;a0=a1;});
-  s+=`<text text-anchor="middle" y="-4" font-size="12" fill="var(--mut)">total</text><text text-anchor="middle" y="16" font-size="16" font-weight="700" fill="var(--txt)">${fmtC(tot)}</text></g>`;
-  arr.forEach(([k,v],j)=>{s+=`<rect x="230" y="${18+j*26}" width="12" height="12" rx="3" fill="${PAL[j%PAL.length]}"/><text x="248" y="${29+j*26}" font-size="12" fill="var(--txt)">${esc(String(k).slice(0,16))}</text><text x="415" y="${29+j*26}" font-size="11" fill="var(--mut)" text-anchor="end">${(v/tot*100).toFixed(0)}%</text>`;});
-  return s+'</svg>';
+function renderFiltros(){
+  const F=$('#filtros');let h='';
+  dims.slice(0,8).forEach(i=>{
+    const g=agrupar(filtrar(i),i);const sel=filtros[i]||new Set();const q=(buscaF[i]||'').toLowerCase();
+    let arr=[...g.entries()].sort((a,b)=>b[1].v-a[1].v);const max=arr.length?arr[0][1].v:1;
+    const tot=arr.length;if(q)arr=arr.filter(([k])=>String(k).toLowerCase().includes(q));
+    h+=`<div class="fgrp ${aberto[i]?'open':''}" data-g="${i}"><div class="fh" data-tg="${i}">${aberto[i]?'▼':'▶'} <b>${esc(C[i].nome)}</b><span class="cnt">${tot}</span><span class="sel">${sel.size?[...sel].slice(0,3).join(', ')+(sel.size>3?' +'+(sel.size-3):''):'Todos'}</span></div><div class="fb">`;
+    if(tot>8)h+=`<input class="q" data-q="${i}" placeholder="Buscar em ${esc(C[i].nome.toLowerCase())}…" value="${esc(buscaF[i]||'')}">`;
+    h+=`<div class="meta"><span data-none="${i}">${sel.size?'Desmarcar':'Nada marcado = todos'}</span><span data-all="${i}">Marcar todos os ${tot}</span></div><div class="fl">`;
+    arr.slice(0,300).forEach(([k,o])=>{const on=sel.has(String(k));h+=`<label class="fi ${sel.size&&!on?'off':''}"><input type="checkbox" data-dim="${i}" data-val="${esc(k)}" ${on?'checked':''}><span>${esc(String(k))}</span><span class="v"><b>${fmtC(o.v)}</b>${nomeMeta?` · <i>${fmtC(o.m)}</i>`:''}</span><span class="bar"><i style="width:${max?o.v/max*100:0}%"></i></span></label>`;});
+    if(arr.length>300)h+=`<div class="sub">… ${arr.length-300} mais (use a busca)</div>`;
+    h+='</div></div></div>';});
+  F.innerHTML=h;
+  F.querySelectorAll('[data-tg]').forEach(e=>e.onclick=()=>{const i=+e.dataset.tg;aberto[i]=!aberto[i];e.parentElement.classList.toggle('open',aberto[i]);e.firstChild.textContent=aberto[i]?'▼ ':'▶ ';});
+  F.querySelectorAll('input[type=checkbox]').forEach(c=>c.onchange=()=>toggle(+c.dataset.dim,c.dataset.val,false));
+  F.querySelectorAll('[data-none]').forEach(e=>e.onclick=()=>{delete filtros[+e.dataset.none];render();});
+  F.querySelectorAll('[data-all]').forEach(e=>e.onclick=()=>{const i=+e.dataset.all;filtros[i]=new Set([...agrupar(filtrar(i),i).keys()].map(String));render();});
+  F.querySelectorAll('input.q').forEach(e=>{e.oninput=()=>{buscaF[+e.dataset.q]=e.value;const pos=e.selectionStart;renderFiltros();const n=$(`input.q[data-q="${e.dataset.q}"]`);n.focus();n.setSelectionRange(pos,pos);};});
 }
-function gHeat(rows,i){
-  const g=new Map(),tot=new Map();const meses=new Set();
-  for(const r of rows){const k=mesKey(r[iData]);if(!k)continue;meses.add(k);const d=r[i]??'(vazio)';if(!g.has(d))g.set(d,new Map());g.get(d).set(k,(g.get(d).get(k)||0)+(typeof r[iVal]==='number'?r[iVal]:0));tot.set(d,(tot.get(d)||0)+(typeof r[iVal]==='number'?r[iVal]:0));}
-  const ms=[...meses].sort().slice(-12),ds=[...tot.entries()].sort((a,b)=>b[1]-a[1]).slice(0,8).map(e=>e[0]);if(!ds.length)return '<div class="empty">Sem dados</div>';
-  let max=0;for(const d of ds)for(const m of ms)max=Math.max(max,g.get(d).get(m)||0);
-  const cw=Math.min(44,(420-110)/ms.length),W=110+cw*ms.length,H=22+ds.length*26;let s=`<svg viewBox="0 0 ${W} ${H}">`;
-  ms.forEach((m,j)=>{if(cw>=34||j%2===(ms.length-1)%2)s+=`<text x="${110+j*cw+cw/2}" y="12" font-size="10" fill="var(--mut)" text-anchor="middle">${mesLabel(m)}</text>`;});
-  ds.forEach((d,r)=>{s+=`<text x="104" y="${22+r*26+16}" font-size="11" fill="var(--txt)" text-anchor="end">${esc(String(d).slice(0,15))}</text>`;
-    ms.forEach((m,j)=>{const v=g.get(d).get(m)||0;const t=max?v/max:0;s+=`<rect class="bar" x="${110+j*cw+1}" y="${22+r*26+2}" width="${cw-2}" height="22" rx="4" fill="var(--acc)" opacity="${0.08+t*0.92}" data-tip="${esc(d)} · ${mesLabel(m)}: ${fmtN(v)}" data-dim="${i}" data-val="${esc(d)}"/>`;});});
-  return s+'</svg>';
+function pontos(rows){
+  const out=[];const tot=soma(rows,iVal),met=iMeta!=null?soma(rows,iMeta):0;
+  if(iMeta!=null&&met){const p=tot/met*100;if(p<80)out.push(['!','Abaixo de 80% da meta no recorte',`${p.toFixed(1)}% — faltam ${fmtN(met-tot)} para a meta.`]);else if(p>120)out.push(['w','Mais de 120% da meta no recorte',`${p.toFixed(1)}% — pode indicar meta subestimada.`]);}
+  dims.slice(0,3).forEach(i=>{const g=agrupar(rows,i);const arr=[...g.entries()].sort((a,b)=>b[1].v-a[1].v);if(!arr.length)return;
+    const top=arr[0];if(arr.length>2&&top[1].v/tot>0.5)out.push(['w',`Concentração em ${C[i].nome.toLowerCase()}`,`${top[0]} responde por ${(top[1].v/tot*100).toFixed(0)}% de ${nomeVal.toLowerCase()}.`]);
+    if(iMeta!=null)arr.filter(([,o])=>o.m>0&&o.v/o.m<0.8&&o.m>met*0.05).slice(0,3).forEach(([k,o])=>out.push(['!',`${C[i].nome}: ${k} abaixo da meta`,`${(o.v/o.m*100).toFixed(0)}% (${fmtN(o.v)} de ${fmtN(o.m)}).`]));
+    const zero=arr.filter(([,o])=>o.v===0&&o.m>0).length;if(zero)out.push(['i',`${zero} ${C[i].nome.toLowerCase()}(s) com meta e sem ${nomeVal.toLowerCase()}`,'Itens com meta cadastrada e nenhum valor realizado.']);});
+  if(iData!=null){const g=new Map();for(const r of rows){const k=mesKey(r[iData]);if(k)g.set(k,(g.get(k)||0)+num(r,iVal));}const ks=[...g.keys()].sort();
+    if(ks.length>=2){const u=g.get(ks[ks.length-1]),a=g.get(ks[ks.length-2]);if(a&&(u-a)/a<-0.15)out.push(['!',`Queda de ${(Math.abs(u-a)/a*100).toFixed(0)}% em ${mesLabel(ks[ks.length-1])}`,`${fmtN(u)} contra ${fmtN(a)} em ${mesLabel(ks[ks.length-2])}. Se o mês ainda não fechou, é parcial.`]);
+      const med=ks.slice(0,-1).reduce((s,k)=>s+g.get(k),0)/(ks.length-1);if(u>med*1.5)out.push(['i',`${mesLabel(ks[ks.length-1])} 50% acima da média`,`${fmtN(u)} contra média de ${fmtN(med)}.`]);}}
+  $('#nPontos').textContent=out.length;
+  $('#pontos').innerHTML=out.length?out.map(([t,b,d])=>`<div class="pt"><div class="ic ${t==='!'?'':t}">${t==='!'?'!':t==='w'?'▲':'i'}</div><div><b>${esc(b)}</b><span>${esc(d)}</span></div></div>`).join(''):'<div class="empty">Nenhum ponto de atenção no recorte atual.</div>';
 }
 function tabela(rows){
   let r=rows;if(busca)r=r.filter(x=>x.some(v=>v!=null&&String(v).toLowerCase().includes(busca)));
   if(ordem.c!=null)r=[...r].sort((a,b)=>{const x=a[ordem.c],y=b[ordem.c];return (x==null?-Infinity:x)<(y==null?-Infinity:y)?-ordem.d:(x>y?ordem.d:0);});
   const pp=25,np=Math.max(1,Math.ceil(r.length/pp));pag=Math.min(pag,np-1);const sl=r.slice(pag*pp,pag*pp+pp);
+  $('#tsub').textContent=`${r.length.toLocaleString('pt-BR')} linhas no recorte`;
   $('#tbl').innerHTML=`<table><thead><tr>${C.map((c,i)=>`<th class="${c.tipo==='numero'?'n':''}" data-c="${i}">${esc(c.nome)}${ordem.c===i?(ordem.d>0?' ▲':' ▼'):''}</th>`).join('')}</tr></thead><tbody>${sl.map(x=>`<tr>${x.map((v,i)=>`<td class="${C[i].tipo==='numero'?'n':''}">${v==null?'':C[i].tipo==='numero'?fmtN(v):C[i].tipo==='data'?String(v).slice(0,10).split('-').reverse().join('/'):esc(v)}</td>`).join('')}</tr>`).join('')}</tbody></table>`;
   $('#tbl').querySelectorAll('th').forEach(th=>th.onclick=()=>{const c=+th.dataset.c;ordem=ordem.c===c?{c,d:-ordem.d}:{c,d:1};tabela(rows);});
-  $('#pag').innerHTML=`${r.length.toLocaleString('pt-BR')} linhas · página ${pag+1}/${np} <button class="btn" id="pa">‹</button><button class="btn" id="pb">›</button>`;
+  $('#pag').innerHTML=`página ${pag+1}/${np} <button id="pa">‹</button><button id="pb">›</button>`;
   $('#pa').onclick=()=>{if(pag>0){pag--;tabela(rows);}};$('#pb').onclick=()=>{if(pag<np-1){pag++;tabela(rows);}};
 }
-function exportar(){const rows=filtrar();const csv=[C.map(c=>c.nome).join(';'),...rows.map(r=>r.map(v=>v==null?'':typeof v==='number'?String(v).replace('.',','):'"'+String(v).replace(/"/g,'""')+'"').join(';'))].join('\r\n');
-  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob(['\ufeff'+csv],{type:'text/csv'}));a.download='painel_filtrado.csv';a.click();}
-/* interações: tooltip + clique filtra */
+function exportCsv(head,rows,nome){const csv=[head.join(';'),...rows.map(r=>r.map(v=>v==null?'':typeof v==='number'?String(v).replace('.',','):'"'+String(v).replace(/"/g,'""')+'"').join(';'))].join('\r\n');
+  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob(['﻿'+csv],{type:'text/csv'}));a.download=nome;a.click();}
+/* interações */
 const tip=$('#tip');
 document.addEventListener('mousemove',e=>{const t=e.target.closest('[data-tip]');if(t){tip.style.display='block';tip.textContent=t.dataset.tip;tip.style.left=(e.clientX+12)+'px';tip.style.top=(e.clientY-28)+'px';}else tip.style.display='none';});
-document.addEventListener('click',e=>{const t=e.target.closest('[data-dim]');if(t){const i=+t.dataset.dim,v=t.dataset.val;if(filtros[i]&&filtros[i].has(v)&&!e.ctrlKey)delete filtros[i];else if(e.ctrlKey&&filtros[i])filtros[i].add(v);else filtros[i]=new Set([v]);
-    const s=$(`#filters select[data-dim="${i}"]`);if(s)s.value=filtros[i]&&filtros[i].size===1?[...filtros[i]][0]:'';render();return;}
-  const m=e.target.closest('[data-mes]');if(m){const k=m.dataset.mes;const d0=k+'-01',d1=new Date(+k.slice(0,4),+k.slice(5,7),0).toISOString().slice(0,10);periodo=[d0,d1];$('#d0').value=d0;$('#d1').value=d1;render();}});
+document.addEventListener('click',e=>{
+  const t=e.target.closest('.bar[data-dim],.chip[data-dim]');if(t){toggle(+t.dataset.dim,t.dataset.val,!e.ctrlKey);return;}
+  const m=e.target.closest('[data-mes]');if(m&&iData!=null){const k=m.dataset.mes;const d0=k+'-01',d1=new Date(+k.slice(0,4),+k.slice(5,7),0).toISOString().slice(0,10);if(periodo[0]===d0&&periodo[1]===d1){const ds=P.linhas.map(r=>r[iData]).filter(Boolean).sort();periodo=[ds[0],ds[ds.length-1]];}else periodo=[d0,d1];$('#d0').value=periodo[0].slice(0,10);$('#d1').value=periodo[1].slice(0,10);render();}});
 </script>
 </body>
 </html>
