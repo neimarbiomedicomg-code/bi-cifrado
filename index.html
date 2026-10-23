@@ -92,6 +92,13 @@ td.n,th.n{text-align:right;font-variant-numeric:tabular-nums}
 .side-toggle{display:none}
 @media(max-width:1100px){.body{grid-template-columns:1fr}.side{position:static;max-height:none}.kpis{grid-template-columns:repeat(2,1fr)}.g2{grid-template-columns:1fr}.head h1{font-size:26px}.body{padding:12px}.head{padding:14px 14px 0}}
 @media(max-width:520px){.kpis{grid-template-columns:1fr}}
+.modal{position:fixed;inset:0;background:rgba(10,20,20,.55);display:none;place-items:center;z-index:30;padding:16px}.modal.on{display:grid}
+.mbox{background:var(--card);color:var(--txt);border-radius:12px;width:100%;max-width:560px;max-height:90vh;overflow:auto;padding:20px 22px;box-shadow:0 20px 60px rgba(0,0,0,.4)}
+.mbox h3{margin:0 0 4px}.mbox .sub{color:var(--mut);font-size:13px;margin-bottom:12px}
+.mrow{display:grid;grid-template-columns:22px 1fr auto auto;gap:10px;align-items:center;padding:8px 0;border-bottom:1px solid var(--line);font-size:14px}
+.mrow .t{color:var(--mut);font-size:12px}.mrow select{padding:4px 8px;border-radius:6px;border:1px solid var(--line);background:var(--bg);color:var(--txt);font-size:12px}
+.mbox .acts{display:flex;gap:8px;justify-content:flex-end;margin-top:14px}.mbox .acts button{padding:8px 14px;border-radius:6px;border:1px solid var(--line);background:var(--bg);color:var(--txt);cursor:pointer}.mbox .acts button.p{background:var(--teal);border-color:var(--teal);color:#fff}
+.rng{display:flex;gap:8px;align-items:center;font-size:12px;color:var(--mut)}.rng input{width:100%;padding:7px;border-radius:8px;border:1px solid var(--line);background:var(--bg);color:var(--txt)}
 </style>
 </head>
 <body>
@@ -111,7 +118,7 @@ td.n,th.n{text-align:right;font-variant-numeric:tabular-nums}
     <div class="eyebrow" id="eyebrow">PAINEL</div>
     <div class="row">
       <div><h1 id="titulo"></h1><div class="base" id="base"></div></div>
-      <div class="hbtn"><button id="tema">◐ Tema</button><button id="csv">Exportar CSV ▾</button><button id="limpar">Limpar filtros</button><button class="p" id="sair">Bloquear</button></div>
+      <div class="hbtn"><button id="gerf">Gerenciar filtros</button><button id="tema">◐ Tema</button><button id="csv">Exportar CSV ▾</button><button id="limpar">Limpar filtros</button><button class="p" id="sair">Bloquear</button></div>
     </div>
     <div class="tabs"><button class="tab on" data-tab="geral">Visão geral</button><button class="tab" data-tab="pontos">Pontos de atenção <span class="n" id="nPontos">0</span></button></div>
   </div>
@@ -137,6 +144,7 @@ td.n,th.n{text-align:right;font-variant-numeric:tabular-nums}
   </div>
 </div>
 <div class="tip" id="tip"></div>
+<div class="modal" id="modal"><div class="mbox"><h3>Gerenciar filtros</h3><div class="sub">Marque as colunas que devem aparecer como filtro. Colunas de texto viram lista de seleção; colunas numéricas viram faixa (mín–máx). A ordem aqui é a ordem no painel.</div><div id="mlist"></div><div class="acts"><button id="mauto">Sugestão automática</button><button id="mfechar">Cancelar</button><button class="p" id="mok">Aplicar</button></div></div></div>
 
 <script>
 /* ---------- cifra ---------- */
@@ -149,7 +157,7 @@ async function decifrar(u8,senha){
   const ds=new DecompressionStream('gzip');const w=ds.writable.getWriter();w.write(gz);w.close();return JSON.parse(td.decode(await new Response(ds.readable).arrayBuffer()));
 }
 /* ---------- estado ---------- */
-const $=s=>document.querySelector(s);let P=null,bin=null,filtros={},periodo=[null,null],ordem={c:null,d:1},pag=0,busca='',aberto={},buscaF={};
+const $=s=>document.querySelector(s);let P=null,bin=null,filtros={},filtrosNum={},periodo=[null,null],ordem={c:null,d:1},pag=0,busca='',aberto={},buscaF={},filtroCols=[];
 const fmtN=n=>n==null?'–':new Intl.NumberFormat('pt-BR',{maximumFractionDigits:Math.abs(n)<100?2:0}).format(n);
 const fmtC=n=>{if(n==null)return '–';const a=Math.abs(n);if(a>=1e9)return (n/1e9).toLocaleString('pt-BR',{maximumFractionDigits:2})+' bi';if(a>=1e6)return (n/1e6).toLocaleString('pt-BR',{maximumFractionDigits:1})+' mi';if(a>=1e4)return (n/1e3).toLocaleString('pt-BR',{maximumFractionDigits:0})+' mil';return fmtN(n);};
 const MES=['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'];
@@ -174,7 +182,7 @@ document.querySelectorAll('.tab').forEach(t=>t.onclick=()=>{document.querySelect
 /* ---------- init ---------- */
 let C,iData,iVal,iMeta,dims,nomeVal,nomeMeta;
 function iniciar(){
-  filtros={};periodo=[null,null];ordem={c:null,d:1};pag=0;busca='';$('#busca').value='';aberto={};buscaF={};
+  filtros={};filtrosNum={};periodo=[null,null];ordem={c:null,d:1};pag=0;busca='';$('#busca').value='';aberto={};buscaF={};
   C=P.cols;iData=P.papeis.data;iVal=P.papeis.valor;iMeta=P.papeis.meta;
   nomeVal=C[iVal].nome;nomeMeta=iMeta!=null?C[iMeta].nome:null;
   dims=C.map((c,i)=>i).filter(i=>C[i].tipo==='categoria'&&C[i].distintos<=500&&C[i].distintos>1).sort((a,b)=>C[a].distintos-C[b].distintos);
@@ -188,15 +196,19 @@ function iniciar(){
     $('#fper').innerHTML=`<div class="fgrp open"><div class="fh"><b>Período</b></div><div class="fb" style="display:flex;gap:8px"><input type="date" id="d0" value="${ds[0].slice(0,10)}" style="flex:1;padding:7px;border-radius:8px;border:1px solid var(--line);background:var(--bg);color:var(--txt)"><input type="date" id="d1" value="${ds[ds.length-1].slice(0,10)}" style="flex:1;padding:7px;border-radius:8px;border:1px solid var(--line);background:var(--bg);color:var(--txt)"></div></div>`;
     $('#d0').onchange=e=>{periodo[0]=e.target.value;render();};$('#d1').onchange=e=>{periodo[1]=e.target.value;render();};}
   else $('#fper').innerHTML='';
-  dims.slice(0,2).forEach(i=>aberto[i]=true);
+  filtroCols=null;try{const s=localStorage.getItem('bic_filtros_'+(P.titulo||''));if(s){const a=JSON.parse(s);if(Array.isArray(a)&&a.every(i=>C[i]))filtroCols=a;}}catch{}
+  if(!filtroCols)filtroCols=dims.slice(0,8);
+  filtroCols.slice(0,2).forEach(i=>aberto[i]=true);
+  $('#gerf').onclick=abrirGer;
   $('#busca').oninput=e=>{busca=e.target.value.toLowerCase();pag=0;tabela(filtrar());};
-  $('#limpar').onclick=$('#limpar2').onclick=()=>{filtros={};if(iData!=null){const ds=P.linhas.map(r=>r[iData]).filter(Boolean).sort();periodo=[ds[0],ds[ds.length-1]];$('#d0').value=ds[0].slice(0,10);$('#d1').value=ds[ds.length-1].slice(0,10);}render();};
+  $('#limpar').onclick=$('#limpar2').onclick=()=>{filtros={};filtrosNum={};if(iData!=null){const ds=P.linhas.map(r=>r[iData]).filter(Boolean).sort();periodo=[ds[0],ds[ds.length-1]];$('#d0').value=ds[0].slice(0,10);$('#d1').value=ds[ds.length-1].slice(0,10);}render();};
   $('#csv').onclick=()=>exportCsv(C.map(c=>c.nome),filtrar(),'painel_filtrado.csv');
   $('#expTbl').onclick=()=>exportCsv(C.map(c=>c.nome),filtrar(),'detalhe.csv');
   render();
 }
 function filtrar(exceto){return P.linhas.filter(r=>{if(iData!=null&&r[iData]){const d=String(r[iData]).slice(0,10);if(periodo[0]&&d<periodo[0].slice(0,10))return false;if(periodo[1]&&d>periodo[1].slice(0,10))return false;}
-  for(const i in filtros){if(+i===exceto)continue;if(filtros[i].size&&!filtros[i].has(String(r[i]??'(vazio)')))return false;}return true;});}
+  for(const i in filtros){if(+i===exceto)continue;if(filtros[i].size&&!filtros[i].has(String(r[i]??'(vazio)')))return false;}
+  for(const i in filtrosNum){const f=filtrosNum[i],v=r[i];if(typeof v!=='number')return false;if(f.min!=null&&v<f.min)return false;if(f.max!=null&&v>f.max)return false;}return true;});}
 const num=(r,i)=>typeof r[i]==='number'?r[i]:0;
 function soma(rows,i){let s=0;for(const r of rows)s+=num(r,i);return s;}
 function agrupar(rows,i){const m=new Map();for(const r of rows){const k=r[i]??'(vazio)';let o=m.get(k);if(!o){o={v:0,m:0,n:0};m.set(k,o);}o.v+=num(r,iVal);if(iMeta!=null)o.m+=num(r,iMeta);o.n++;}return m;}
@@ -208,6 +220,7 @@ function render(){
   // chips
   let ch='<span>Filtrando por</span>';let any=false;
   for(const i in filtros)for(const v of filtros[i]){any=true;ch+=`<span class="chip" data-dim="${i}" data-val="${esc(v)}">${esc(C[i].nome)}: ${esc(v)} ✕</span>`;}
+  for(const i in filtrosNum){any=true;const f=filtrosNum[i];ch+=`<span class="chip" data-num="${i}">${esc(C[i].nome)}: ${f.min!=null?fmtN(f.min):'…'} – ${f.max!=null?fmtN(f.max):'…'} ✕</span>`;}
   if(!any)ch+='<span class="chip" style="cursor:default;opacity:.7">tudo</span>';
   ch+=`<span class="right">${rows.length.toLocaleString('pt-BR')} registros no recorte</span>`;$('#chips').innerHTML=ch;
   // kpis
@@ -260,7 +273,10 @@ function gMeses(m){
 }
 function renderFiltros(){
   const F=$('#filtros');let h='';
-  dims.slice(0,8).forEach(i=>{
+  filtroCols.forEach(i=>{
+    if(C[i].tipo==='numero'){const f=filtrosNum[i]||{};const vals=filtrar().map(r=>r[i]).filter(v=>typeof v==='number');const mn=vals.length?Math.min(...vals):0,mx=vals.length?Math.max(...vals):0;
+      h+=`<div class="fgrp ${aberto[i]?'open':''}"><div class="fh" data-tg="${i}">${aberto[i]?'▼':'▶'} <b>${esc(C[i].nome)}</b><span class="cnt">faixa</span><span class="sel">${f.min!=null||f.max!=null?(f.min!=null?fmtN(f.min):'…')+' – '+(f.max!=null?fmtN(f.max):'…'):'Todos'}</span></div><div class="fb"><div class="rng"><input type="number" step="any" placeholder="mín (${fmtN(mn)})" data-rmin="${i}" value="${f.min??''}"><span>a</span><input type="number" step="any" placeholder="máx (${fmtN(mx)})" data-rmax="${i}" value="${f.max??''}"></div><div class="meta" style="margin-top:6px"><span data-rclr="${i}">Limpar faixa</span><span></span></div></div></div>`;return;}
+    if(C[i].tipo==='data')return;
     const g=agrupar(filtrar(i),i);const sel=filtros[i]||new Set();const q=(buscaF[i]||'').toLowerCase();
     let arr=[...g.entries()].sort((a,b)=>b[1].v-a[1].v);const max=arr.length?arr[0][1].v:1;
     const tot=arr.length;if(q)arr=arr.filter(([k])=>String(k).toLowerCase().includes(q));
@@ -275,6 +291,10 @@ function renderFiltros(){
   F.querySelectorAll('input[type=checkbox]').forEach(c=>c.onchange=()=>toggle(+c.dataset.dim,c.dataset.val,false));
   F.querySelectorAll('[data-none]').forEach(e=>e.onclick=()=>{delete filtros[+e.dataset.none];render();});
   F.querySelectorAll('[data-all]').forEach(e=>e.onclick=()=>{const i=+e.dataset.all;filtros[i]=new Set([...agrupar(filtrar(i),i).keys()].map(String));render();});
+  const setRng=(i,k,v)=>{filtrosNum[i]=filtrosNum[i]||{};filtrosNum[i][k]=v===''?null:+v;if(filtrosNum[i].min==null&&filtrosNum[i].max==null)delete filtrosNum[i];render();};
+  F.querySelectorAll('[data-rmin]').forEach(e=>e.onchange=()=>setRng(+e.dataset.rmin,'min',e.value));
+  F.querySelectorAll('[data-rmax]').forEach(e=>e.onchange=()=>setRng(+e.dataset.rmax,'max',e.value));
+  F.querySelectorAll('[data-rclr]').forEach(e=>e.onclick=()=>{delete filtrosNum[+e.dataset.rclr];render();});
   F.querySelectorAll('input.q').forEach(e=>{e.oninput=()=>{buscaF[+e.dataset.q]=e.value;const pos=e.selectionStart;renderFiltros();const n=$(`input.q[data-q="${e.dataset.q}"]`);n.focus();n.setSelectionRange(pos,pos);};});
 }
 function pontos(rows){
@@ -302,10 +322,29 @@ function tabela(rows){
 }
 function exportCsv(head,rows,nome){const csv=[head.join(';'),...rows.map(r=>r.map(v=>v==null?'':typeof v==='number'?String(v).replace('.',','):'"'+String(v).replace(/"/g,'""')+'"').join(';'))].join('\r\n');
   const a=document.createElement('a');a.href=URL.createObjectURL(new Blob(['﻿'+csv],{type:'text/csv'}));a.download=nome;a.click();}
+/* gerenciar filtros */
+function abrirGer(){
+  const ord=[...filtroCols,...C.map((c,i)=>i).filter(i=>!filtroCols.includes(i))];
+  $('#mlist').innerHTML=ord.map(i=>{const c=C[i];const on=filtroCols.includes(i);const t=c.tipo==='numero'?'faixa numérica':c.tipo==='data'?'data (já é o Período)':`lista · ${c.distintos} valores`;
+    return `<div class="mrow" draggable="true" data-i="${i}"><input type="checkbox" data-mc="${i}" ${on?'checked':''} ${c.tipo==='data'?'disabled':''}><span>${esc(c.nome)}</span><span class="t">${t}</span><span style="display:flex;gap:4px"><button class="exp" data-up="${i}" title="subir">▲</button><button class="exp" data-dn="${i}" title="descer">▼</button></span></div>`;}).join('');
+  const mv=(i,d)=>{const rows=[...$('#mlist').children];const k=rows.findIndex(r=>+r.dataset.i===i);const j=k+d;if(j<0||j>=rows.length)return;const r=rows[k];if(d<0)$('#mlist').insertBefore(r,rows[j]);else $('#mlist').insertBefore(rows[j],r);};
+  $('#mlist').querySelectorAll('[data-up]').forEach(b=>b.onclick=()=>mv(+b.dataset.up,-1));
+  $('#mlist').querySelectorAll('[data-dn]').forEach(b=>b.onclick=()=>mv(+b.dataset.dn,1));
+  $('#modal').classList.add('on');
+}
+$('#mfechar').onclick=()=>$('#modal').classList.remove('on');
+$('#modal').onclick=e=>{if(e.target.id==='modal')$('#modal').classList.remove('on');};
+$('#mauto').onclick=()=>{$('#mlist').querySelectorAll('[data-mc]').forEach(c=>{c.checked=dims.slice(0,8).includes(+c.dataset.mc);});};
+$('#mok').onclick=()=>{filtroCols=[...$('#mlist').querySelectorAll('[data-mc]')].filter(c=>c.checked).map(c=>+c.dataset.mc);
+  for(const i in filtros)if(!filtroCols.includes(+i))delete filtros[i];for(const i in filtrosNum)if(!filtroCols.includes(+i))delete filtrosNum[i];
+  filtroCols.forEach(i=>{if(aberto[i]===undefined)aberto[i]=true;});
+  try{localStorage.setItem('bic_filtros_'+(P.titulo||''),JSON.stringify(filtroCols));}catch{}
+  $('#modal').classList.remove('on');render();};
 /* interações */
 const tip=$('#tip');
 document.addEventListener('mousemove',e=>{const t=e.target.closest('[data-tip]');if(t){tip.style.display='block';tip.textContent=t.dataset.tip;tip.style.left=(e.clientX+12)+'px';tip.style.top=(e.clientY-28)+'px';}else tip.style.display='none';});
 document.addEventListener('click',e=>{
+  const cn=e.target.closest('.chip[data-num]');if(cn){delete filtrosNum[+cn.dataset.num];render();return;}
   const t=e.target.closest('.bar[data-dim],.chip[data-dim]');if(t){toggle(+t.dataset.dim,t.dataset.val,!e.ctrlKey);return;}
   const m=e.target.closest('[data-mes]');if(m&&iData!=null){const k=m.dataset.mes;const d0=k+'-01',d1=new Date(+k.slice(0,4),+k.slice(5,7),0).toISOString().slice(0,10);if(periodo[0]===d0&&periodo[1]===d1){const ds=P.linhas.map(r=>r[iData]).filter(Boolean).sort();periodo=[ds[0],ds[ds.length-1]];}else periodo=[d0,d1];$('#d0').value=periodo[0].slice(0,10);$('#d1').value=periodo[1].slice(0,10);render();}});
 </script>
