@@ -1,0 +1,234 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data: blob:; connect-src 'self'; form-action 'none'; base-uri 'none'">
+<title>Painel BI</title>
+<style>
+:root{--bg:#f4f6fb;--card:#fff;--line:#e5e9f2;--txt:#13203a;--mut:#6b7691;--acc:#3b6cff;--acc2:#7c5cff;--ok:#1fa971;--warn:#e9a23b;--err:#e5484d;--sh:0 8px 24px rgba(20,30,60,.08)}
+:root[data-theme=dark]{--bg:#0b1020;--card:#121a30;--line:#22304f;--txt:#e8edf7;--mut:#8b97b3;--acc:#5b8dff;--acc2:#9b7dff;--sh:0 10px 30px rgba(0,0,0,.35)}
+*{box-sizing:border-box}html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--txt);font:14px/1.45 system-ui,Segoe UI,Roboto,sans-serif}
+button,select,input{font:inherit}
+/* tela de senha */
+#lock{position:fixed;inset:0;display:grid;place-items:center;background:radial-gradient(900px 500px at 30% 0%,#2a3f80 0%,#0b1020 60%);color:#e8edf7;z-index:10;padding:16px}
+.lk{width:100%;max-width:400px;background:#121a30;border:1px solid #22304f;border-radius:18px;padding:28px;box-shadow:0 20px 60px rgba(0,0,0,.4)}
+.lk h1{font-size:22px;margin:0 0 4px}.lk p{color:#8b97b3;margin:0 0 18px;font-size:13px}
+.lk input{width:100%;padding:12px;border-radius:10px;border:1px solid #22304f;background:#0e1529;color:#fff;font-size:16px;margin-bottom:10px}
+.lk button{width:100%;padding:12px;border:0;border-radius:10px;background:var(--acc);color:#fff;font-weight:600;cursor:pointer;font-size:15px}
+.lk .alt{background:#1b2744;margin-top:8px}
+.lk .err{color:#ff7b82;font-size:13px;margin-top:10px;min-height:18px}
+.lk .seal{display:flex;gap:8px;align-items:center;font-size:12px;color:#8b97b3;margin-top:16px}
+/* app */
+#app{display:none;max-width:1280px;margin:0 auto;padding:16px}
+.top{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;margin-bottom:14px}
+.top h1{font-size:22px;margin:0;letter-spacing:-.3px}
+.top .meta{color:var(--mut);font-size:12px}
+.tools{display:flex;gap:8px;flex-wrap:wrap}
+.btn{background:var(--card);border:1px solid var(--line);color:var(--txt);border-radius:10px;padding:8px 12px;cursor:pointer;box-shadow:var(--sh)}
+.btn.p{background:var(--acc);border-color:var(--acc);color:#fff}
+.filters{display:flex;gap:8px;flex-wrap:wrap;align-items:center;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 12px;box-shadow:var(--sh);margin-bottom:14px}
+.filters select,.filters input{background:var(--bg);border:1px solid var(--line);color:var(--txt);border-radius:9px;padding:7px 10px}
+.chip{background:var(--acc);color:#fff;border-radius:999px;padding:4px 10px;font-size:12px;cursor:pointer}
+.grid{display:grid;gap:14px;grid-template-columns:repeat(12,1fr)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;box-shadow:var(--sh);min-width:0}
+.card h3{margin:0 0 10px;font-size:13px;color:var(--mut);font-weight:600;text-transform:uppercase;letter-spacing:.4px;display:flex;justify-content:space-between;align-items:center;gap:8px}
+.card h3 select{font-size:12px;text-transform:none;letter-spacing:0;background:var(--bg);border:1px solid var(--line);color:var(--txt);border-radius:8px;padding:4px 8px}
+.kpi{grid-column:span 3}.kpi .v{font-size:26px;font-weight:700;letter-spacing:-.5px;line-height:1.1}
+.kpi .d{font-size:12px;color:var(--mut);margin-top:6px}.kpi .d b{font-weight:600}
+.up{color:var(--ok)}.dn{color:var(--err)}
+.c6{grid-column:span 6}.c8{grid-column:span 8}.c4{grid-column:span 4}.c12{grid-column:span 12}
+svg{width:100%;height:auto;display:block}
+.bar{cursor:pointer;transition:opacity .15s}.bar:hover{opacity:.8}
+.tip{position:fixed;pointer-events:none;background:var(--txt);color:var(--card);padding:6px 10px;border-radius:8px;font-size:12px;display:none;z-index:20;white-space:nowrap}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th,td{padding:7px 8px;border-bottom:1px solid var(--line);text-align:left;white-space:nowrap}
+th{color:var(--mut);font-weight:600;cursor:pointer;user-select:none;position:sticky;top:0;background:var(--card)}
+td.n,th.n{text-align:right;font-variant-numeric:tabular-nums}
+.tbl{overflow:auto;max-height:420px;border-radius:10px}
+.pag{display:flex;gap:8px;align-items:center;justify-content:flex-end;margin-top:8px;color:var(--mut);font-size:12px}
+.empty{color:var(--mut);padding:30px;text-align:center}
+@media(max-width:900px){.kpi{grid-column:span 6}.c6,.c8,.c4{grid-column:span 12}}
+@media(max-width:520px){.kpi{grid-column:span 12}#app{padding:10px}.kpi .v{font-size:22px}}
+</style>
+</head>
+<body>
+<div id="lock"><div class="lk">
+  <h1 id="lkTitle">Painel BI</h1>
+  <p>Os dados estão cifrados. A senha abre o painel aqui, no seu navegador. Nada é enviado ao servidor.</p>
+  <input type="password" id="pw" placeholder="Senha de acesso" autocomplete="current-password">
+  <button id="abrir">Abrir painel</button>
+  <button class="alt" id="arq">Escolher o arquivo dados.bin manualmente</button>
+  <input type="file" id="arqIn" accept=".bin" hidden>
+  <div class="err" id="lkErr"></div>
+  <div class="seal">🔒 AES-256-GCM · PBKDF2 250.000 it. · descriptografia local</div>
+</div></div>
+
+<div id="app">
+  <div class="top">
+    <div><h1 id="titulo">Painel</h1><div class="meta" id="meta"></div></div>
+    <div class="tools"><button class="btn" id="tema">◐ Tema</button><button class="btn" id="limpar">Limpar filtros</button><button class="btn" id="csv">Exportar CSV</button><button class="btn" id="sair">Bloquear</button></div>
+  </div>
+  <div class="filters" id="filters"></div>
+  <div class="grid" id="grid">
+    <div class="card kpi"><h3>Total</h3><div class="v" id="kTotal">–</div><div class="d" id="kTotalD"></div></div>
+    <div class="card kpi"><h3 id="kMetaH">Meta</h3><div class="v" id="kMeta">–</div><div class="d" id="kMetaD"></div></div>
+    <div class="card kpi"><h3>Último mês</h3><div class="v" id="kMes">–</div><div class="d" id="kMesD"></div></div>
+    <div class="card kpi"><h3 id="kDistH">Registros</h3><div class="v" id="kDist">–</div><div class="d" id="kDistD"></div></div>
+    <div class="card c8"><h3>Mês a mês <span id="legenda" style="font-weight:400;text-transform:none"></span></h3><div id="gMes"></div></div>
+    <div class="card c4"><h3>Ranking <select id="selRank"></select></h3><div id="gRank"></div></div>
+    <div class="card c6"><h3>Participação <select id="selPart"></select></h3><div id="gPart"></div></div>
+    <div class="card c6"><h3>Mapa de calor <select id="selHeat"></select></h3><div id="gHeat"></div></div>
+    <div class="card c12"><h3>Detalhe <input id="busca" placeholder="Buscar…" style="font-size:12px;text-transform:none;letter-spacing:0;background:var(--bg);border:1px solid var(--line);color:var(--txt);border-radius:8px;padding:4px 8px"></h3><div class="tbl" id="tbl"></div><div class="pag" id="pag"></div></div>
+  </div>
+</div>
+<div class="tip" id="tip"></div>
+
+<script>
+/* ---------- cifra ---------- */
+const enc=new TextEncoder(),td=new TextDecoder();
+async function derivar(senha,salt){const km=await crypto.subtle.importKey('raw',enc.encode(senha),'PBKDF2',false,['deriveKey']);return crypto.subtle.deriveKey({name:'PBKDF2',salt,iterations:250000,hash:'SHA-256'},km,{name:'AES-GCM',length:256},false,['decrypt']);}
+async function decifrar(u8,senha){
+  if(String.fromCharCode(...u8.subarray(0,4))!=='BIC1')throw new Error('Arquivo não é um dados.bin válido');
+  const key=await derivar(senha,u8.subarray(4,20));
+  const gz=await crypto.subtle.decrypt({name:'AES-GCM',iv:u8.subarray(20,32)},key,u8.subarray(32));
+  const ds=new DecompressionStream('gzip');const w=ds.writable.getWriter();w.write(gz);w.close();return JSON.parse(td.decode(await new Response(ds.readable).arrayBuffer()));
+}
+/* ---------- estado ---------- */
+const $=s=>document.querySelector(s);let P=null,bin=null,filtros={},periodo=[null,null],ordem={c:null,d:1},pag=0,busca='';
+const PAL=['#3b6cff','#7c5cff','#1fa971','#e9a23b','#e5484d','#17a2b8','#ff7ab6','#8bc34a','#9e9e9e','#6d4c41'];
+const fmtN=n=>n==null?'–':new Intl.NumberFormat('pt-BR',{maximumFractionDigits:Math.abs(n)<100?2:0}).format(n);
+const fmtC=n=>n==null?'–':new Intl.NumberFormat('pt-BR',{notation:Math.abs(n)>=1e6?'compact':'standard',maximumFractionDigits:Math.abs(n)>=1e6?2:0}).format(n);
+const MES=['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'];
+const mesKey=d=>d?String(d).slice(0,7):null;const mesLabel=k=>k?MES[+k.slice(5,7)-1]+'/'+k.slice(2,4):'';
+/* ---------- abertura ---------- */
+async function tentarFetch(){try{const r=await fetch('dados.bin',{cache:'no-store'});if(r.ok){bin=new Uint8Array(await r.arrayBuffer());if(String.fromCharCode(...bin.subarray(0,4))==='BIC1')return true;}}catch{}bin=null;return false;}
+tentarFetch().then(ok=>{if(!ok)$('#lkErr').textContent='dados.bin não encontrado ao lado do painel. Use "Escolher o arquivo".';});
+$('#arq').onclick=()=>$('#arqIn').click();
+$('#arqIn').onchange=async e=>{const f=e.target.files[0];if(f){bin=new Uint8Array(await f.arrayBuffer());$('#lkErr').textContent='Arquivo carregado. Digite a senha.';}};
+$('#abrir').onclick=abrir;$('#pw').onkeydown=e=>{if(e.key==='Enter')abrir();};
+async function abrir(){
+  if(!bin){if(!await tentarFetch()){$('#lkErr').textContent='Escolha o arquivo dados.bin primeiro.';return;}}
+  $('#abrir').textContent='Abrindo…';$('#abrir').disabled=true;
+  try{P=await decifrar(bin,$('#pw').value);$('#pw').value='';iniciar();}
+  catch(e){$('#lkErr').textContent=e.message.includes('válido')?e.message:'Senha incorreta.';}
+  $('#abrir').textContent='Abrir painel';$('#abrir').disabled=false;
+}
+$('#sair').onclick=()=>{P=null;$('#app').style.display='none';$('#lock').style.display='grid';$('#grid').querySelectorAll('[id^=g],#tbl').forEach(e=>e.innerHTML='');};
+$('#tema').onclick=()=>{const r=document.documentElement;r.dataset.theme=r.dataset.theme==='dark'?'light':'dark';};
+if(matchMedia('(prefers-color-scheme:dark)').matches)document.documentElement.dataset.theme='dark';
+/* ---------- init ---------- */
+let C,iData,iVal,iMeta,dims,nums;
+function iniciar(){
+  filtros={};periodo=[null,null];ordem={c:null,d:1};pag=0;busca='';$('#busca').value='';
+  C=P.cols;iData=P.papeis.data;iVal=P.papeis.valor;iMeta=P.papeis.meta;
+  dims=C.map((c,i)=>i).filter(i=>C[i].tipo==='categoria'&&C[i].distintos<=200&&C[i].distintos>1);
+  nums=C.map((c,i)=>i).filter(i=>C[i].tipo==='numero');
+  $('#titulo').textContent=P.titulo;$('#lkTitle').textContent=P.titulo;
+  $('#meta').textContent=`${P.linhas.length.toLocaleString('pt-BR')} registros · origem ${P.origem} · gerado em ${new Date(P.geradoEm).toLocaleString('pt-BR')}`;
+  $('#lock').style.display='none';$('#app').style.display='block';
+  // filtros
+  const F=$('#filters');F.innerHTML='';
+  if(iData!=null){const ds=P.linhas.map(r=>r[iData]).filter(Boolean).sort();periodo=[ds[0],ds[ds.length-1]];
+    F.insertAdjacentHTML('beforeend',`<span style="color:var(--mut);font-size:12px">Período</span><input type="date" id="d0" value="${ds[0].slice(0,10)}"><input type="date" id="d1" value="${ds[ds.length-1].slice(0,10)}">`);
+    $('#d0').onchange=e=>{periodo[0]=e.target.value;render();};$('#d1').onchange=e=>{periodo[1]=e.target.value;render();};}
+  dims.slice(0,5).forEach(i=>{const vals=[...new Set(P.linhas.map(r=>r[i]).filter(v=>v!=null&&v!==''))].sort();
+    F.insertAdjacentHTML('beforeend',`<select data-dim="${i}"><option value="">${C[i].nome}: todos</option>${vals.map(v=>`<option>${v}</option>`).join('')}</select>`);});
+  F.querySelectorAll('select').forEach(s=>s.onchange=()=>{const i=+s.dataset.dim;if(s.value)filtros[i]=new Set([s.value]);else delete filtros[i];render();});
+  const opts=dims.map(i=>`<option value="${i}">${C[i].nome}</option>`).join('');
+  ['#selRank','#selPart','#selHeat'].forEach((s,k)=>{$(s).innerHTML=opts;$(s).value=dims[Math.min(k,dims.length-1)];$(s).onchange=render;});
+  $('#kMetaH').textContent=iMeta!=null?'Atingimento':'Média por registro';
+  $('#kDistH').textContent=dims.length?C[dims[0]].nome:'Registros';
+  $('#busca').oninput=e=>{busca=e.target.value.toLowerCase();pag=0;render();};
+  $('#limpar').onclick=()=>{filtros={};F.querySelectorAll('select').forEach(s=>s.value='');if(iData!=null){const ds=P.linhas.map(r=>r[iData]).filter(Boolean).sort();periodo=[ds[0],ds[ds.length-1]];$('#d0').value=ds[0].slice(0,10);$('#d1').value=ds[ds.length-1].slice(0,10);}render();};
+  $('#csv').onclick=exportar;
+  render();
+}
+function filtrar(){return P.linhas.filter(r=>{if(iData!=null&&r[iData]){const d=r[iData].slice(0,10);if(periodo[0]&&d<periodo[0].slice(0,10))return false;if(periodo[1]&&d>periodo[1].slice(0,10))return false;}
+  for(const i in filtros)if(!filtros[i].has(String(r[i])))return false;return true;});}
+function soma(rows,i){let s=0;for(const r of rows)if(typeof r[i]==='number')s+=r[i];return s;}
+function agrupar(rows,i,v){const m=new Map();for(const r of rows){const k=r[i]??'(vazio)';m.set(k,(m.get(k)||0)+(typeof r[v]==='number'?r[v]:0));}return m;}
+function chipsFiltro(){const F=$('#filters');F.querySelectorAll('.chip').forEach(c=>c.remove());for(const i in filtros)for(const v of filtros[i]){if([...F.querySelectorAll('select')].some(s=>s.dataset.dim==i&&s.value===v))continue;const c=document.createElement('span');c.className='chip';c.textContent=`${C[i].nome}: ${v} ✕`;c.onclick=()=>{delete filtros[i];render();};F.appendChild(c);}}
+/* ---------- render ---------- */
+function render(){
+  const rows=filtrar();chipsFiltro();
+  const total=soma(rows,iVal);
+  $('#kTotal').textContent=fmtC(total);$('#kTotalD').innerHTML=`<b>${rows.length.toLocaleString('pt-BR')}</b> registros no filtro`;
+  if(iMeta!=null){const m=soma(rows,iMeta);const at=m?total/m*100:null;$('#kMeta').innerHTML=at==null?'–':`<span class="${at>=100?'up':at>=80?'':'dn'}">${at.toFixed(1)}%</span>`;$('#kMetaD').innerHTML=`meta <b>${fmtC(m)}</b> · ${at==null?'':(total-m>=0?'+':'')+fmtC(total-m)}`;}
+  else{$('#kMeta').textContent=fmtC(rows.length?total/rows.length:null);$('#kMetaD').textContent='valor médio';}
+  // mês
+  let meses=[];if(iData!=null){const g=new Map(),gm=new Map();for(const r of rows){const k=mesKey(r[iData]);if(!k)continue;g.set(k,(g.get(k)||0)+(typeof r[iVal]==='number'?r[iVal]:0));if(iMeta!=null)gm.set(k,(gm.get(k)||0)+(typeof r[iMeta]==='number'?r[iMeta]:0));}
+    meses=[...g.keys()].sort().map(k=>({k,v:g.get(k),m:gm.get(k)}));}
+  if(meses.length){const u=meses[meses.length-1],a=meses[meses.length-2];const var_=a&&a.v?(u.v-a.v)/a.v*100:null;
+    $('#kMes').textContent=fmtC(u.v);$('#kMesD').innerHTML=`${mesLabel(u.k)}${var_==null?'':` · <b class="${var_>=0?'up':'dn'}">${var_>=0?'▲':'▼'} ${Math.abs(var_).toFixed(1)}%</b> vs ${mesLabel(a.k)}`}`;}
+  else{$('#kMes').textContent='–';$('#kMesD').textContent='sem coluna de data';}
+  if(dims.length){const n=new Set(rows.map(r=>r[dims[0]])).size;$('#kDist').textContent=n.toLocaleString('pt-BR');$('#kDistD').textContent='distintos no filtro';}
+  else{$('#kDist').textContent=rows.length.toLocaleString('pt-BR');$('#kDistD').textContent='linhas';}
+  $('#gMes').innerHTML=meses.length?gMeses(meses):'<div class="empty">Sem coluna de data</div>';
+  $('#legenda').textContent=iMeta!=null?'■ real  – – meta':'';
+  const iR=+$('#selRank').value,iP=+$('#selPart').value,iH=+$('#selHeat').value;
+  $('#gRank').innerHTML=dims.length?gRank(agrupar(rows,iR,iVal),iR):'';
+  $('#gPart').innerHTML=dims.length?gRosca(agrupar(rows,iP,iVal),iP):'';
+  $('#gHeat').innerHTML=dims.length&&iData!=null?gHeat(rows,iH):'<div class="empty">Precisa de data e categoria</div>';
+  tabela(rows);
+}
+const esc=s=>String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;');
+function gMeses(m){
+  const W=760,H=260,L=56,R=16,T=16,B=36;const n=m.length,max=Math.max(...m.map(x=>Math.max(x.v,x.m||0)))||1;
+  const x=i=>L+(W-L-R)*(i+0.5)/n,bw=Math.min(40,(W-L-R)/n*0.6),y=v=>T+(H-T-B)*(1-v/max);
+  let s=`<svg viewBox="0 0 ${W} ${H}">`;
+  for(let k=0;k<=4;k++){const v=max*k/4;s+=`<line x1="${L}" x2="${W-R}" y1="${y(v)}" y2="${y(v)}" stroke="var(--line)"/><text x="${L-6}" y="${y(v)+4}" font-size="10" fill="var(--mut)" text-anchor="end">${fmtC(v)}</text>`;}
+  m.forEach((p,i)=>{s+=`<rect class="bar" x="${x(i)-bw/2}" y="${y(p.v)}" width="${bw}" height="${H-B-y(p.v)}" rx="5" fill="var(--acc)" data-tip="${mesLabel(p.k)}: ${fmtN(p.v)}${p.m?' · meta '+fmtN(p.m):''}" data-mes="${p.k}"/>`;
+    if(n<=18||i%Math.ceil(n/18)===0)s+=`<text x="${x(i)}" y="${H-B+16}" font-size="11" fill="var(--mut)" text-anchor="middle">${mesLabel(p.k)}</text>`;});
+  if(m.some(p=>p.m)){s+=`<polyline fill="none" stroke="var(--warn)" stroke-width="2" stroke-dasharray="5 4" points="${m.map((p,i)=>`${x(i)},${y(p.m||0)}`).join(' ')}"/>`;}
+  return s+'</svg>';
+}
+function gRank(map,i){
+  const arr=[...map.entries()].sort((a,b)=>b[1]-a[1]).slice(0,10);if(!arr.length)return '<div class="empty">Sem dados</div>';
+  const max=arr[0][1]||1,H=arr.length*28+4,W=360;let s=`<svg viewBox="0 0 ${W} ${H}">`;
+  arr.forEach(([k,v],j)=>{const y=j*28,w=Math.max(2,(W-195)*v/max);
+    s+=`<text x="0" y="${y+17}" font-size="12" fill="var(--txt)">${esc(String(k).slice(0,18))}</text><rect class="bar" x="140" y="${y+5}" width="${w}" height="16" rx="4" fill="${PAL[j%PAL.length]}" data-tip="${esc(k)}: ${fmtN(v)}" data-dim="${i}" data-val="${esc(k)}"/><text x="${145+w}" y="${y+17}" font-size="11" fill="var(--mut)">${fmtC(v)}</text>`;});
+  return s+'</svg>';
+}
+function gRosca(map,i){
+  let arr=[...map.entries()].filter(e=>e[1]>0).sort((a,b)=>b[1]-a[1]);if(!arr.length)return '<div class="empty">Sem dados</div>';
+  if(arr.length>7){const o=arr.slice(6).reduce((s,e)=>s+e[1],0);arr=arr.slice(0,6);arr.push(['Outros',o]);}
+  const tot=arr.reduce((s,e)=>s+e[1],0);let a0=-Math.PI/2,s=`<svg viewBox="0 0 420 220"><g transform="translate(110,110)">`;
+  arr.forEach(([k,v],j)=>{const a1=a0+v/tot*2*Math.PI;const r=95,ri=58;const p=(a,rr)=>`${(rr*Math.cos(a)).toFixed(1)},${(rr*Math.sin(a)).toFixed(1)}`;const big=a1-a0>Math.PI?1:0;
+    s+=`<path class="bar" d="M${p(a0,r)} A${r},${r} 0 ${big} 1 ${p(a1,r)} L${p(a1,ri)} A${ri},${ri} 0 ${big} 0 ${p(a0,ri)} Z" fill="${PAL[j%PAL.length]}" data-tip="${esc(k)}: ${fmtN(v)} (${(v/tot*100).toFixed(1)}%)" ${k!=='Outros'?`data-dim="${i}" data-val="${esc(k)}"`:''}/>`;a0=a1;});
+  s+=`<text text-anchor="middle" y="-4" font-size="12" fill="var(--mut)">total</text><text text-anchor="middle" y="16" font-size="16" font-weight="700" fill="var(--txt)">${fmtC(tot)}</text></g>`;
+  arr.forEach(([k,v],j)=>{s+=`<rect x="230" y="${18+j*26}" width="12" height="12" rx="3" fill="${PAL[j%PAL.length]}"/><text x="248" y="${29+j*26}" font-size="12" fill="var(--txt)">${esc(String(k).slice(0,16))}</text><text x="415" y="${29+j*26}" font-size="11" fill="var(--mut)" text-anchor="end">${(v/tot*100).toFixed(0)}%</text>`;});
+  return s+'</svg>';
+}
+function gHeat(rows,i){
+  const g=new Map(),tot=new Map();const meses=new Set();
+  for(const r of rows){const k=mesKey(r[iData]);if(!k)continue;meses.add(k);const d=r[i]??'(vazio)';if(!g.has(d))g.set(d,new Map());g.get(d).set(k,(g.get(d).get(k)||0)+(typeof r[iVal]==='number'?r[iVal]:0));tot.set(d,(tot.get(d)||0)+(typeof r[iVal]==='number'?r[iVal]:0));}
+  const ms=[...meses].sort().slice(-12),ds=[...tot.entries()].sort((a,b)=>b[1]-a[1]).slice(0,8).map(e=>e[0]);if(!ds.length)return '<div class="empty">Sem dados</div>';
+  let max=0;for(const d of ds)for(const m of ms)max=Math.max(max,g.get(d).get(m)||0);
+  const cw=Math.min(44,(420-110)/ms.length),W=110+cw*ms.length,H=22+ds.length*26;let s=`<svg viewBox="0 0 ${W} ${H}">`;
+  ms.forEach((m,j)=>{if(cw>=34||j%2===(ms.length-1)%2)s+=`<text x="${110+j*cw+cw/2}" y="12" font-size="10" fill="var(--mut)" text-anchor="middle">${mesLabel(m)}</text>`;});
+  ds.forEach((d,r)=>{s+=`<text x="104" y="${22+r*26+16}" font-size="11" fill="var(--txt)" text-anchor="end">${esc(String(d).slice(0,15))}</text>`;
+    ms.forEach((m,j)=>{const v=g.get(d).get(m)||0;const t=max?v/max:0;s+=`<rect class="bar" x="${110+j*cw+1}" y="${22+r*26+2}" width="${cw-2}" height="22" rx="4" fill="var(--acc)" opacity="${0.08+t*0.92}" data-tip="${esc(d)} · ${mesLabel(m)}: ${fmtN(v)}" data-dim="${i}" data-val="${esc(d)}"/>`;});});
+  return s+'</svg>';
+}
+function tabela(rows){
+  let r=rows;if(busca)r=r.filter(x=>x.some(v=>v!=null&&String(v).toLowerCase().includes(busca)));
+  if(ordem.c!=null)r=[...r].sort((a,b)=>{const x=a[ordem.c],y=b[ordem.c];return (x==null?-Infinity:x)<(y==null?-Infinity:y)?-ordem.d:(x>y?ordem.d:0);});
+  const pp=25,np=Math.max(1,Math.ceil(r.length/pp));pag=Math.min(pag,np-1);const sl=r.slice(pag*pp,pag*pp+pp);
+  $('#tbl').innerHTML=`<table><thead><tr>${C.map((c,i)=>`<th class="${c.tipo==='numero'?'n':''}" data-c="${i}">${esc(c.nome)}${ordem.c===i?(ordem.d>0?' ▲':' ▼'):''}</th>`).join('')}</tr></thead><tbody>${sl.map(x=>`<tr>${x.map((v,i)=>`<td class="${C[i].tipo==='numero'?'n':''}">${v==null?'':C[i].tipo==='numero'?fmtN(v):C[i].tipo==='data'?String(v).slice(0,10).split('-').reverse().join('/'):esc(v)}</td>`).join('')}</tr>`).join('')}</tbody></table>`;
+  $('#tbl').querySelectorAll('th').forEach(th=>th.onclick=()=>{const c=+th.dataset.c;ordem=ordem.c===c?{c,d:-ordem.d}:{c,d:1};tabela(rows);});
+  $('#pag').innerHTML=`${r.length.toLocaleString('pt-BR')} linhas · página ${pag+1}/${np} <button class="btn" id="pa">‹</button><button class="btn" id="pb">›</button>`;
+  $('#pa').onclick=()=>{if(pag>0){pag--;tabela(rows);}};$('#pb').onclick=()=>{if(pag<np-1){pag++;tabela(rows);}};
+}
+function exportar(){const rows=filtrar();const csv=[C.map(c=>c.nome).join(';'),...rows.map(r=>r.map(v=>v==null?'':typeof v==='number'?String(v).replace('.',','):'"'+String(v).replace(/"/g,'""')+'"').join(';'))].join('\r\n');
+  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob(['\ufeff'+csv],{type:'text/csv'}));a.download='painel_filtrado.csv';a.click();}
+/* interações: tooltip + clique filtra */
+const tip=$('#tip');
+document.addEventListener('mousemove',e=>{const t=e.target.closest('[data-tip]');if(t){tip.style.display='block';tip.textContent=t.dataset.tip;tip.style.left=(e.clientX+12)+'px';tip.style.top=(e.clientY-28)+'px';}else tip.style.display='none';});
+document.addEventListener('click',e=>{const t=e.target.closest('[data-dim]');if(t){const i=+t.dataset.dim,v=t.dataset.val;if(filtros[i]&&filtros[i].has(v)&&!e.ctrlKey)delete filtros[i];else if(e.ctrlKey&&filtros[i])filtros[i].add(v);else filtros[i]=new Set([v]);
+    const s=$(`#filters select[data-dim="${i}"]`);if(s)s.value=filtros[i]&&filtros[i].size===1?[...filtros[i]][0]:'';render();return;}
+  const m=e.target.closest('[data-mes]');if(m){const k=m.dataset.mes;const d0=k+'-01',d1=new Date(+k.slice(0,4),+k.slice(5,7),0).toISOString().slice(0,10);periodo=[d0,d1];$('#d0').value=d0;$('#d1').value=d1;render();}});
+</script>
+</body>
+</html>
